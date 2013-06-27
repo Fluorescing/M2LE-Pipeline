@@ -45,16 +45,13 @@ public class M2LE_Localization implements PlugIn {
      */
     @Override
     public void run(String arg) {
-     // Get the job from the user
+        // Get the job from the user
         final JobContext job = new JobContext();
-        
         UserParams.getUserParameters(job);
         job.initialize();
         
         // check if user cancelled
-        if (job.isCanceled()) {
-            return;
-        }
+        if (job.isCanceled()) return;
         
         final boolean debugMode = job.getCheckboxValue(UserParams.DEBUG_MODE);
         ResultsTable debugTable = null;
@@ -111,7 +108,7 @@ public class M2LE_Localization implements PlugIn {
         IJ.showStatus("Printing Results...");
         BlockingQueue<Estimate> funnelled = FunnelEstimates.findSubset(stack, estimates);
         
-        final int pixelSize = (int) job.getNumericValue(UserParams.PIXEL_SIZE);
+        final double pixelSize = job.getNumericValue(UserParams.PIXEL_SIZE);
         
         // should we render an image?
         final boolean render = job.getCheckboxValue(UserParams.RENDER_ENABLED);
@@ -143,43 +140,14 @@ public class M2LE_Localization implements PlugIn {
                         rendering[y][x] += 1;
                 }
                 
-                results.incrementCounter();
-                results.addValue("Frame", estimate.getSlice());
-                results.addValue("x (px)", estimate.getXEstimate());
-                results.addValue("y (px)", estimate.getYEstimate());
-                results.addValue("x (nm)", estimate.getXEstimate()*pixelSize);
-                results.addValue("y (nm)", estimate.getYEstimate()*pixelSize);
-                results.addValue("Intensity x", estimate.getIntensityEstimateX());
-                results.addValue("Intensity y", estimate.getIntensityEstimateY());
-                results.addValue("Background x", estimate.getBackgroundEstimateX());
-                results.addValue("Background y", estimate.getBackgroundEstimateY());
-                results.addValue("Width x", estimate.getWidthEstimateX());
-                results.addValue("Width y", estimate.getWidthEstimateY());
-                
-                if (debugMode) {
-                    results.addValue("Minor Axis", estimate.getMinorAxis());
-                    results.addValue("Major Axis", estimate.getMajorAxis());
-                    results.addValue("ROI x", estimate.getX()+0.5);
-                    results.addValue("ROI y", estimate.getY()+0.5);
-                    
-                    results.addValue("thirdsum", estimate.getThirdMomentSum());
-                    results.addValue("thirddiff", estimate.getThirdMomentDiff());
-                    
-                    if (debugTable != null) {
-                        for (int column = 0; debugTable.columnExists(column); column++) {
-                            final String name = "D_"+debugTable.getColumnHeading(column);
-                            final double value = debugTable.getValueAsDouble(column, estimate.getSlice()-1);
-                            results.addValue(name, value);
-                        }
-                    }
-                }
+                addResult(results, estimate, pixelSize, debugTable, debugMode);
                 
             } catch (InterruptedException e) {
                 IJ.handleException(e);
             }
         }
         
-        // display rendering
+        // display reconstruction
         if (render) {
             final ImagePlus rimp = IJ.createImage("Sample Rendering", "16-bit", rwidth, rheight, 1);
             final ImageProcessor rip = rimp.getProcessor();
@@ -196,6 +164,50 @@ public class M2LE_Localization implements PlugIn {
         
         IJ.showStatus(String.format("%d Localizations.", SIZE));
         IJ.log(String.format("[%d localizations]", SIZE));
+    }
+
+    /**
+     * Adds a result to the results table.
+     * @param results the results table
+     * @param estimate the final estimate
+     * @param pixelSize the size of the pixel in 
+     * @param debugTable the debug table (table created when the simulated images were created)
+     * @param debugMode whether debug mode is on or off
+     */
+    private static void addResult(final ResultsTable results, final Estimate estimate,
+            final double pixelSize, ResultsTable debugTable, final boolean debugMode) {
+        
+        // add result
+        results.incrementCounter();
+        results.addValue("Frame", estimate.getSlice());
+        results.addValue("x (px)", estimate.getXEstimate());
+        results.addValue("y (px)", estimate.getYEstimate());
+        results.addValue("x (nm)", estimate.getXEstimate()*pixelSize);
+        results.addValue("y (nm)", estimate.getYEstimate()*pixelSize);
+        results.addValue("Intensity x", estimate.getIntensityEstimateX());
+        results.addValue("Intensity y", estimate.getIntensityEstimateY());
+        results.addValue("Background x", estimate.getBackgroundEstimateX());
+        results.addValue("Background y", estimate.getBackgroundEstimateY());
+        results.addValue("Width x", estimate.getWidthEstimateX());
+        results.addValue("Width y", estimate.getWidthEstimateY());
+        
+        if (debugMode) {
+            results.addValue("Minor Axis", estimate.getMinorAxis());
+            results.addValue("Major Axis", estimate.getMajorAxis());
+            results.addValue("ROI x", estimate.getX()+0.5);
+            results.addValue("ROI y", estimate.getY()+0.5);
+            
+            results.addValue("thirdsum", estimate.getThirdMomentSum());
+            results.addValue("thirddiff", estimate.getThirdMomentDiff());
+            
+            if (debugTable != null) {
+                for (int column = 0; debugTable.columnExists(column); column++) {
+                    final String name = "D_"+debugTable.getColumnHeading(column);
+                    final double value = debugTable.getValueAsDouble(column, estimate.getSlice()-1);
+                    results.addValue(name, value);
+                }
+            }
+        }
     }
 
 }
