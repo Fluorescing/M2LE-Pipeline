@@ -11,7 +11,7 @@ public final class UserParams {
     
     private UserParams() { }
     
-    public static final String VERSION = "1.1.14";
+    public static final String VERSION = "1.1.15";
     
     public static final String SN_RATIO = "M2LEPL.IA.SNC";
     public static final String LOWEST_NOISE_EST = "M2LEPL.IA.LNE";
@@ -26,6 +26,7 @@ public final class UserParams {
     public static final String WAVELENGTH = "M2LEPL.ML.LW";
     public static final String N_APERTURE = "M2LEPL.ML.NA";
     public static final String USABLE_PIXEL = "M2LEPL.ML.UP";
+    public static final String ML_FIX_WIDTH = "M2LEPL.ML.FW";
     public static final String ML_POS_EPSILON = "M2LEPL.ML.PT";
     public static final String ML_INT_EPSILON = "M2LEPL.ML.IT";
     public static final String ML_WID_EPSILON = "M2LEPL.ML.WT";
@@ -37,6 +38,8 @@ public final class UserParams {
     public static final String ML_MIN_WIDTH = "M2LEPL.ML.MIW";
     public static final String DB_TABLE = "M2LEPL.DB.DT";
     public static final String DB_ROI = "M2LEPL.DB.ROI";
+    public static final String RENDER_ENABLED = "M2LEPL.RENDER";
+    public static final String RENDER_SCALE = "M2LEPL.RENDERSCALE";
     
     /**
      * Returns a version string containing the major, minor, and build version.
@@ -81,6 +84,7 @@ public final class UserParams {
         job.addCheckboxParam(THRD_DISABLED,     "Disable_Third Moment Rejector", false);
         
         job.addMessage("Maximum Likelihood Estimator");
+        job.addCheckboxParam(ML_FIX_WIDTH,      "Fixed Width",  true);
         job.addNumericParam(WAVELENGTH,         "Light Wavelength",       550.0,  1, "nanometers");
         job.addNumericParam(N_APERTURE,         "Numerical Aperture",       1.0,  2, "");
         job.addNumericParam(USABLE_PIXEL,       "Usable Pixel",            90.0,  1, "%");
@@ -94,6 +98,10 @@ public final class UserParams {
         job.addNumericParam(ML_MIN_NOISE,       "Min Noise Bound",          1.0,  2, "photons");
         job.addNumericParam(ML_MAX_WIDTH,       "MaxWidth",                 3.0,  2, "px");
         job.addNumericParam(ML_MIN_WIDTH,       "MinWidth",                 1.5,  2, "px");
+        
+        job.addMessage("Sample Rendering");
+        job.addCheckboxParam(RENDER_ENABLED,    "Enable rendering", false);
+        job.addNumericParam(RENDER_SCALE,       "Render scale",             4.0,  4, "");
         
         job.addMessage(String.format("Version: %s", VERSION));
     }

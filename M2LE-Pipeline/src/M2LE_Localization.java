@@ -14,9 +14,11 @@ import com.m2le.core.ThirdMomentRejector;
 import com.m2le.core.UserParams;
 
 import ij.IJ;
+import ij.ImagePlus;
 import ij.WindowManager;
 import ij.measure.ResultsTable;
 import ij.plugin.PlugIn;
+import ij.process.ImageProcessor;
 import ij.text.TextPanel;
 import ij.text.TextWindow;
 
@@ -96,6 +98,17 @@ public class M2LE_Localization implements PlugIn {
         
         final int pixelSize = (int) job.getNumericValue(UserParams.PIXEL_SIZE);
         
+        // should we render an image?
+        final boolean render = job.getCheckboxValue(UserParams.RENDER_ENABLED);
+        final double rscale = job.getNumericValue(UserParams.RENDER_SCALE);
+        
+        final int rwidth = (int) (stack.getWidth()*rscale);
+        final int rheight = (int) (stack.getHeight()*rscale);
+        
+        int[][] rendering = null;
+        if (render)
+            rendering = new int[rheight][rwidth];
+        
         // add to results table
         int SIZE = funnelled.size()-1;
         while (true) {
@@ -106,6 +119,14 @@ public class M2LE_Localization implements PlugIn {
                 // check for the end of the queue
                 if (estimate.isEndOfQueue())
                     break;
+                
+                // accumulate image
+                if (render && rendering != null) {
+                    final int x = (int) (estimate.getXEstimate()*rscale);
+                    final int y = (int) (estimate.getYEstimate()*rscale);
+                    if (x >= 0 && x < rwidth && y >= 0 && y < rheight)
+                        rendering[y][x] += 1;
+                }
                 
                 results.incrementCounter();
                 results.addValue("Frame", estimate.getSlice());
@@ -141,6 +162,18 @@ public class M2LE_Localization implements PlugIn {
             } catch (InterruptedException e) {
                 IJ.handleException(e);
             }
+        }
+        
+        // display rendering
+        if (render) {
+            final ImagePlus rimp = IJ.createImage("Sample Rendering", "16-bit", rwidth, rheight, 1);
+            final ImageProcessor rip = rimp.getProcessor();
+            for (int y = 0; y < rheight; y++) {
+                for (int x = 0; x < rwidth; x++) {
+                    rip.set(x, y, rendering[y][x]);
+                }
+            }
+            rimp.show();
         }
         
         // show the results

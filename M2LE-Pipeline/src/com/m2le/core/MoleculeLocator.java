@@ -194,6 +194,7 @@ public final class MoleculeLocator {
         final int maxIter = (int) job.getNumericValue(UserParams.ML_MAX_ITERATIONS);
         final double minWidth = job.getNumericValue(UserParams.ML_MIN_WIDTH);
         final double maxWidth = job.getNumericValue(UserParams.ML_MAX_WIDTH);
+        final boolean fixWidth = job.getCheckboxValue(UserParams.ML_FIX_WIDTH);
         
         // center/focus point
         final int cx = estimate.getX();
@@ -230,11 +231,11 @@ public final class MoleculeLocator {
         // get initial estimates
         final Parameters xparam = new Parameters(stack, estimate, xsignal, 
                                            height, wavenumber, 
-                                           pixelsize, usablepixel);
+                                           pixelsize, usablepixel, fixWidth);
         
         final Parameters yparam = new Parameters(stack, estimate, ysignal, 
                                            width, wavenumber, 
-                                           pixelsize, usablepixel);
+                                           pixelsize, usablepixel, fixWidth);
         
         final double initialnoise = (xparam.background + yparam.background)/2.;
         

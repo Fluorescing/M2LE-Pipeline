@@ -26,6 +26,7 @@ public class Parameters {
     public double intensity;
     public double background;
     public double width;
+    private boolean fixedwidth = false;
     
     /**
      * Constructs a parameter vector with values of zero.
@@ -49,7 +50,8 @@ public class Parameters {
             final int length, 
             final double wavenumber, 
             final double pixelsize,
-            final double usablepixel) {
+            final double usablepixel,
+            final boolean fixwidth) {
         
         // estimate background
         this.background = StaticMath.min(signal)/length;
@@ -58,8 +60,13 @@ public class Parameters {
         this.position = StaticMath.estimateCenter(signal, background*length);
         
         // estimate width
-        this.width = 0.5*(estimate.getMajorAxis() + estimate.getMinorAxis()); 
-        this.width *= 1.4142135623730950488016887242097*pixelsize*wavenumber;
+        if (fixwidth) {
+            this.width = 2.3456387388762832235657480556918/(pixelsize*wavenumber);
+            this.fixedwidth = fixwidth;
+        } else {
+            this.width = 0.5*(estimate.getMajorAxis() + estimate.getMinorAxis()); 
+            this.width *= 1.4142135623730950488016887242097*pixelsize*wavenumber;
+        }
         
         // estimate intensity
         this.intensity = (StaticMath.max(signal) - StaticMath.min(signal))
@@ -80,11 +87,13 @@ public class Parameters {
             final double position, 
             final double intensity, 
             final double background, 
-            final double width) {
+            final double width,
+            final boolean fixwidth) {
         this.position = position;
         this.intensity = intensity;
         this.background = background;
         this.width = width;
+        this.fixedwidth = fixwidth;
     }
     
     /**
@@ -100,7 +109,12 @@ public class Parameters {
         this.position = original.position - delta.position*coefficient;
         this.intensity = original.intensity - delta.intensity*coefficient;
         this.background = original.background - delta.background*coefficient;
-        this.width = original.width - delta.width*coefficient;
+        this.fixedwidth = original.fixedwidth;
+        
+        if (!this.fixedwidth)
+            this.width = original.width - delta.width*coefficient;
+        else
+            this.width = original.width;
     }
     
     /**
@@ -112,16 +126,29 @@ public class Parameters {
         this.intensity = parameters.intensity;
         this.background = parameters.background;
         this.width = parameters.width;
+        this.fixedwidth = parameters.fixedwidth;
+    }
+    
+    public void set(final double position, 
+            final double intensity, 
+            final double background, 
+            final double width) {
+        this.position = position;
+        this.intensity = intensity;
+        this.background = background;
+        this.width = width;
     }
     
     public void set(final double position, 
                     final double intensity, 
                     final double background, 
-                    final double width) {
+                    final double width,
+                    final boolean fixedwidth) {
         this.position = position;
         this.intensity = intensity;
         this.background = background;
         this.width = width;
+        this.fixedwidth = fixedwidth;
     }
     
     /**
