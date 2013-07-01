@@ -37,6 +37,12 @@ import ij.process.ImageProcessor;
 import ij.text.TextPanel;
 import ij.text.TextWindow;
 
+/**
+ * The ImageJ plugin class from which the localization job begins.
+ * 
+ * @author Shane Stahlheber
+ *
+ */
 public class M2LE_Localization implements PlugIn {
 
     /**
@@ -74,6 +80,80 @@ public class M2LE_Localization implements PlugIn {
         final ResultsTable results = new ResultsTable();
         results.setPrecision(10);
         
+        BlockingQueue<Estimate> funnelled = runPipeline(stack);
+        
+        int SIZE = processResults(job, stack, results, funnelled, debugTable, debugMode);
+        
+        // show the results
+        results.show("Localization Results");
+        
+        IJ.showStatus(String.format("%d Localizations.", SIZE));
+        IJ.log(String.format("[%d localizations]", SIZE));
+    }
+
+    /**
+     * Process the estimates.
+     * @param job job settings
+     * @param stack stack of images
+     * @param results the results table
+     * @param estimates list of estimates
+     * @param debugTable the debug table
+     * @param debugMode is debug enabled or disabled
+     * @return returns the number of estimates added to the table
+     */
+    private static int processResults(final JobContext job, final StackContext stack,
+            final ResultsTable results, BlockingQueue<Estimate> estimates,
+            ResultsTable debugTable, final boolean debugMode) {
+        final double pixelSize = job.getNumericValue(UserParams.PIXEL_SIZE);
+        
+        // should we render an image?
+        final boolean render = job.getCheckboxValue(UserParams.RENDER_ENABLED);
+        final double rscale = job.getNumericValue(UserParams.RENDER_SCALE);
+        
+        final int rwidth = (int) (stack.getWidth()*rscale);
+        final int rheight = (int) (stack.getHeight()*rscale);
+        
+        int[][] rendering = null;
+        if (render)
+            rendering = new int[rheight][rwidth];
+        
+        // add to results table
+        int SIZE = estimates.size()-1;
+        while (true) {
+            try {
+                // get pixel
+                final Estimate estimate = estimates.take();
+                
+                // check for the end of the queue
+                if (estimate.isEndOfQueue())
+                    break;
+                
+                // accumulate image
+                if (render && rendering != null) {
+                    final int x = (int) (estimate.getXEstimate()*rscale);
+                    final int y = (int) (estimate.getYEstimate()*rscale);
+                    if (x >= 0 && x < rwidth && y >= 0 && y < rheight)
+                        rendering[y][x] += 1;
+                }
+                
+                addResult(results, estimate, pixelSize, debugTable, debugMode);
+                
+            } catch (InterruptedException e) {
+                IJ.handleException(e);
+            }
+        }
+        
+        // display reconstruction
+        if (render) displayReconstruction(rwidth, rheight, rendering);
+        return SIZE;
+    }
+
+    /**
+     * The actual pipeline which processes the images.
+     * @param stack the stack of images
+     * @return returns the list of estimates
+     */
+    private static BlockingQueue<Estimate> runPipeline(final StackContext stack) {
         IJ.showProgress(0, 100);
         IJ.showStatus("Locating Potential Molecules...");
         
@@ -107,63 +187,24 @@ public class M2LE_Localization implements PlugIn {
         IJ.showProgress(100, 100);
         IJ.showStatus("Printing Results...");
         BlockingQueue<Estimate> funnelled = FunnelEstimates.findSubset(stack, estimates);
-        
-        final double pixelSize = job.getNumericValue(UserParams.PIXEL_SIZE);
-        
-        // should we render an image?
-        final boolean render = job.getCheckboxValue(UserParams.RENDER_ENABLED);
-        final double rscale = job.getNumericValue(UserParams.RENDER_SCALE);
-        
-        final int rwidth = (int) (stack.getWidth()*rscale);
-        final int rheight = (int) (stack.getHeight()*rscale);
-        
-        int[][] rendering = null;
-        if (render)
-            rendering = new int[rheight][rwidth];
-        
-        // add to results table
-        int SIZE = funnelled.size()-1;
-        while (true) {
-            try {
-                // get pixel
-                final Estimate estimate = funnelled.take();
-                
-                // check for the end of the queue
-                if (estimate.isEndOfQueue())
-                    break;
-                
-                // accumulate image
-                if (render && rendering != null) {
-                    final int x = (int) (estimate.getXEstimate()*rscale);
-                    final int y = (int) (estimate.getYEstimate()*rscale);
-                    if (x >= 0 && x < rwidth && y >= 0 && y < rheight)
-                        rendering[y][x] += 1;
-                }
-                
-                addResult(results, estimate, pixelSize, debugTable, debugMode);
-                
-            } catch (InterruptedException e) {
-                IJ.handleException(e);
+        return funnelled;
+    }
+
+    /**
+     * Displays the reconstructed image.
+     * @param width
+     * @param height
+     * @param image the actual reconstructed image
+     */
+    private static void displayReconstruction(final int width, final int height, int[][] image) {
+        final ImagePlus rimp = IJ.createImage("Sample Rendering", "16-bit", width, height, 1);
+        final ImageProcessor rip = rimp.getProcessor();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                rip.set(x, y, image[y][x]);
             }
         }
-        
-        // display reconstruction
-        if (render) {
-            final ImagePlus rimp = IJ.createImage("Sample Rendering", "16-bit", rwidth, rheight, 1);
-            final ImageProcessor rip = rimp.getProcessor();
-            for (int y = 0; y < rheight; y++) {
-                for (int x = 0; x < rwidth; x++) {
-                    rip.set(x, y, rendering[y][x]);
-                }
-            }
-            rimp.show();
-        }
-        
-        // show the results
-        results.show("Localization Results");
-        
-        IJ.showStatus(String.format("%d Localizations.", SIZE));
-        IJ.log(String.format("[%d localizations]", SIZE));
+        rimp.show();
     }
 
     /**
