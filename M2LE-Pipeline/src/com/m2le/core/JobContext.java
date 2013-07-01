@@ -34,7 +34,14 @@ import ij.gui.GenericDialog;
 public class JobContext {
     
     public enum Type {
-        NUMERIC, LABEL, CHECKBOX, CHOICE
+        /** Numeric Field */
+        NUMERIC, 
+        /** Label */
+        LABEL, 
+        /** Check-box Field */
+        CHECKBOX, 
+        /** Combo-box Field */
+        COMBOBOX
     }
     
     private class Parameter {
@@ -119,14 +126,14 @@ public class JobContext {
      * Add a combo-box parameter to the job.
      * @param id the id of the job parameter.
      * @param name the name of the job parameter.
-     * @param defaultValue the default value.
+     * @param choices the possible choices.
      */
     public void addComboboxField(
             final String id, 
             final String name, 
             final String[] choices) {
         final Parameter param = new Parameter();
-        param.type = Type.CHOICE;
+        param.type = Type.COMBOBOX;
         param.id = id;
         param.name = name;
         param.choice = choices;
@@ -179,7 +186,7 @@ public class JobContext {
                 dialog.addCheckbox(param.name,
                         Prefs.get(param.id, param.checkbox));
                 break;
-            case CHOICE:
+            case COMBOBOX:
                 if (param.choice.length > 0)
                     dialog.addChoice(param.name, param.choice, param.choice[0]);
                 else
@@ -208,7 +215,7 @@ public class JobContext {
                 final Boolean checkbox = dialog.getNextBoolean();
                 mCheckbox.put(param.id, checkbox);
                 break;
-            case CHOICE:
+            case COMBOBOX:
                 final String choice = dialog.getNextChoice();
                 mChoice.put(param.id, choice);
                 break;
@@ -250,7 +257,7 @@ public class JobContext {
             case CHECKBOX:
                 IJ.log(String.format("%s: %s", param.name, mCheckbox.get(param.id)?"True":"False"));
                 break;
-            case CHOICE:
+            case COMBOBOX:
                 IJ.log(String.format("%s: %s", param.name, mChoice.get(param.id)));
                 break;
             default:
@@ -261,7 +268,6 @@ public class JobContext {
     
     /**
      * Initialize the job.
-     * @return the new job context.
      */
     public void initialize() {
         

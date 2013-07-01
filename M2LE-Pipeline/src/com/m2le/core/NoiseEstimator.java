@@ -24,10 +24,6 @@ import ij.process.ImageProcessor;
  * <p>
  * Noise estimates are for individual images and are used to find
  * potential molecules.
- * 
- * @see ImageContext
- *
- * @version $Id$
  */
 public class NoiseEstimator {
     

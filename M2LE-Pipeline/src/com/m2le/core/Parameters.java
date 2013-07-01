@@ -37,12 +37,14 @@ public class Parameters {
     /**
      * Constructs a parameter vector by estimating the values from a region
      * of interest.
-     * @param region the region of interest context
+     * @param stack the stack of images
+     * @param estimate the estimate thus far
      * @param signal the array of summed signals
      * @param length the number of pixels summed per signal array element
      * @param wavenumber the wavenumber of light
      * @param pixelsize the size of the pixel across (nanometers)
      * @param usablepixel the fraction of the pixel that is usable
+     * @param fixwidth true if width is fixed; false otherwise
      */
     public Parameters(
             final StackContext stack,

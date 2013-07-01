@@ -27,34 +27,79 @@ public final class UserParams {
     
     private UserParams() { }
     
+    /** The current version of the plugin. */
     public static final String VERSION = "1.1.15";
     
+    /** The signal-to-noise ratio multiple threshold. */
     public static final String SN_RATIO = "M2LEPL.IA.SNC";
+    
+    /** The minimum noise estimate allowed. */
     public static final String LOWEST_NOISE_EST = "M2LEPL.IA.LNE";
+    
+    /** The size of the pixel in nanometers. */
     public static final String PIXEL_SIZE = "M2LEPL.IA.PS";
+    
+    /** The camera saturation value (largest signal possible). */
     public static final String SATURATION = "M2LEPL.IA.SP";
+    
+    /** Debug-mode option. */
     public static final String DEBUG_MODE = "M2LEPL.IA.DM";
+    
+    /** The eccentricity threshold (single-molecule acceptance rate). */
     public static final String ECC_THRESHOLD = "M2LEPL.MR.ET";
+    
+    /** The third-moment threshold (single-molecule acceptance rate). */
     public static final String THRD_THRESHOLD = "M2LEPL.MR.TT";
-    public static final String ECC_RADIUS = "M2LEPL.MR.TR";
+    
+    /** Option to disable the eccentricity shape test. */
     public static final String ECC_DISABLED = "M2LEPL.MR.DER";
+    
+    /** Option to disable the third-moment shape test. */
     public static final String THRD_DISABLED = "M2LEPL.MR.DTR";
+    
+    /** The wavelength of light used; in nanometers. */
     public static final String WAVELENGTH = "M2LEPL.ML.LW";
+    
+    /** The numerical aperture value used. */
     public static final String N_APERTURE = "M2LEPL.ML.NA";
+    
+    /** The fraction of camera pixel that is usable. */
     public static final String USABLE_PIXEL = "M2LEPL.ML.UP";
+    
+    /** Option to fix the width parameter. */
     public static final String ML_FIX_WIDTH = "M2LEPL.ML.FW";
+    
+    /** The ending condition for the MLE (smallest position update). */
     public static final String ML_POS_EPSILON = "M2LEPL.ML.PT";
+    
+    /** The ending condition for the MLE (smallest intensity update). */
     public static final String ML_INT_EPSILON = "M2LEPL.ML.IT";
+    
+    /** The ending condition for the MLE (smallest width update). */
     public static final String ML_WID_EPSILON = "M2LEPL.ML.WT";
+    
+    /** The ending condition for the MLE (maximum number of iterations). */
     public static final String ML_MAX_ITERATIONS = "M2LEPL.ML.MI";
-    public static final String ML_RADIUS = "M2LEPL.ML.IR";
+    
+    /** The maximum noise allowed (MLE). */
     public static final String ML_MAX_NOISE = "M2LEPL.ML.MNM";
+    
+    /** The minimum noise allowed (MLE). */
     public static final String ML_MIN_NOISE = "M2LEPL.ML.MNB";
+    
+    /** The maximum width allowed (MLE). */
     public static final String ML_MAX_WIDTH = "M2LEPL.ML.MAW";
+    
+    /** The minimum width allowed (MLE). */
     public static final String ML_MIN_WIDTH = "M2LEPL.ML.MIW";
+    
+    /** The name of the debug table. */
     public static final String DB_TABLE = "M2LEPL.DB.DT";
-    public static final String DB_ROI = "M2LEPL.DB.ROI";
+    
+    /** Option to enable image reconstruction. */
     public static final String RENDER_ENABLED = "M2LEPL.RENDER";
+    
+    /** The scale of the reconstruction (multiple of the original image size). */
     public static final String RENDER_SCALE = "M2LEPL.RENDERSCALE";
     
     /**

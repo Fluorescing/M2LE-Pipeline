@@ -43,7 +43,7 @@ public class SignalArray {
     }
     
     /**
-     * Accumulate the {@value value} given to the array at {@value index}.
+     * Accumulate the value given to the array at index.
      * @param index the position in the array.
      * @param value the value to add.
      */
@@ -52,7 +52,7 @@ public class SignalArray {
     }
     
     /**
-     * Set the {@value value} given to the array at {@value index}.
+     * Set the value given to the array at index.
      * @param index the position in the array.
      * @param value the value to set.
      */
@@ -61,9 +61,9 @@ public class SignalArray {
     }
     
     /**
-     * Get the value given to the array at {@value index}.
+     * Get the value given to the array at index.
      * @param index the position in the array.
-     * @return the value of the array at the specified {@value index}.
+     * @return the value of the array at the specified index.
      */
     public double get(final int index) {
         return mSignal[index];
@@ -72,7 +72,7 @@ public class SignalArray {
     /**
      * Get the physical position of the element in the array.
      * @param index the position in the array element.
-     * @return the position of the element at the specified {@value index}.
+     * @return the position of the element at the specified index.
      */
     public double getPosition(final int index) {
         return mPosition[index];
