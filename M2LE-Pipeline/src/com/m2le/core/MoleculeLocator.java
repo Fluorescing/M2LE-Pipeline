@@ -59,7 +59,7 @@ public final class MoleculeLocator {
                     findMaxLikelihood(stack, estimate);
                     
                     // put it back if it survived
-                    if (estimate.passed())
+                    if (estimate.hasPassed())
                         estimates.put(estimate);
                     
                 } catch (InterruptedException e) {
@@ -178,7 +178,7 @@ public final class MoleculeLocator {
             final Estimate estimate) {
         
         final JobContext job     = stack.getJobContext();
-        final ImageProcessor ip  = stack.getImageProcessor(estimate.getSlice());
+        final ImageProcessor ip  = stack.getImageProcessor(estimate.getSliceIndex());
         
         // preferences and constants
         final double wavenumber = 2.0*Math.PI*job.getNumericValue(UserParams.N_APERTURE)/job.getNumericValue(UserParams.WAVELENGTH);
@@ -197,8 +197,8 @@ public final class MoleculeLocator {
         final boolean fixWidth = job.getCheckboxValue(UserParams.ML_FIX_WIDTH);
         
         // center/focus point
-        final int cx = estimate.getX();
-        final int cy = estimate.getY();
+        final int cx = estimate.getColumn();
+        final int cy = estimate.getRow();
         
         // set window size
         final int left   = Math.max(0, cx - 3);
@@ -211,7 +211,7 @@ public final class MoleculeLocator {
         
         // check for sufficient size
         if (width < 4 || height < 4) {
-            estimate.reject();
+            estimate.markRejected();
             return estimate;
         }
         
@@ -280,25 +280,25 @@ public final class MoleculeLocator {
         
         // check for invalid parameters (to reject)
         if (!xparam.isValid() || !yparam.isValid()) {
-            estimate.reject();
+            estimate.markRejected();
             return estimate;
         }
         
         if (xparam.position < 0. || xparam.position > pixelsize*width ||
                 yparam.position < 0. || yparam.position > pixelsize*height) {
-            estimate.reject();
+            estimate.markRejected();
             return estimate;
         }
         
         if (xparam.width < minWidth || xparam.width > maxWidth
                 || yparam.width < minWidth || yparam.width > maxWidth) {
-            estimate.reject();
+            estimate.markRejected();
             return estimate;
         }
         
         // record information
-        estimate.setXEstimate(xparam.position/pixelsize + left); 
-        estimate.setYEstimate(yparam.position/pixelsize + top);
+        estimate.setX(xparam.position/pixelsize + left); 
+        estimate.setY(yparam.position/pixelsize + top);
         estimate.setIntensityEstimateX(xparam.intensity);
         estimate.setIntensityEstimateY(yparam.intensity);
         estimate.setBackgroundEstimateX(xparam.background);

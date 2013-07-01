@@ -79,46 +79,50 @@ public final class UserParams {
         return tables.toArray(new String[0]);
     }
     
+    /**
+     * Initialize the user parameters and parameter info for the new job.
+     * @param job the job context
+     */
     public static void getUserParameters(final JobContext job) {
         
         final String[] tables = getResultsTables();
         
-        job.addMessage("Image Analysis");
-        job.addNumericParam(SN_RATIO,           "SignalNoise Cutoff",       4.0,  2, "");
-        job.addNumericParam(LOWEST_NOISE_EST,   "Lowest Noise Estimate",    2.0,  0, "photons");
-        job.addNumericParam(PIXEL_SIZE,         "Pixel Size",             110.0,  2, "nanometers");
-        job.addNumericParam(SATURATION,         "Saturation Point",     65535.0,  2, "DN");
+        job.addLabel("Image Analysis");
+        job.addNumericField(SN_RATIO,           "SignalNoise Cutoff",       4.0,  2, "");
+        job.addNumericField(LOWEST_NOISE_EST,   "Lowest Noise Estimate",    2.0,  0, "photons");
+        job.addNumericField(PIXEL_SIZE,         "Pixel Size",             110.0,  2, "nanometers");
+        job.addNumericField(SATURATION,         "Saturation Point",     65535.0,  2, "DN");
         
-        job.addMessage("Debug Options");
-        job.addCheckboxParam(DEBUG_MODE,        "Debug Mode",   false);
-        job.addChoiceParam(DB_TABLE,            "Debug Table",  tables);
+        job.addLabel("Debug Options");
+        job.addCheckboxField(DEBUG_MODE,        "Debug Mode",   false);
+        job.addComboboxField(DB_TABLE,            "Debug Table",  tables);
         
-        job.addMessage("Molecule Rejection");
-        job.addNumericParam(ECC_THRESHOLD,      "Eccentricity Threshold",    .9,  2, "");
-        job.addNumericParam(THRD_THRESHOLD,     "Third Moment Threshold",    .9,  2, "");
-        job.addCheckboxParam(ECC_DISABLED,      "Disable Ellipticity Rejector", false);
-        job.addCheckboxParam(THRD_DISABLED,     "Disable_Third Moment Rejector", false);
+        job.addLabel("Molecule Rejection");
+        job.addNumericField(ECC_THRESHOLD,      "Eccentricity Threshold",    .9,  2, "");
+        job.addNumericField(THRD_THRESHOLD,     "Third Moment Threshold",    .9,  2, "");
+        job.addCheckboxField(ECC_DISABLED,      "Disable Ellipticity Rejector", false);
+        job.addCheckboxField(THRD_DISABLED,     "Disable_Third Moment Rejector", false);
         
-        job.addMessage("Maximum Likelihood Estimator");
-        job.addCheckboxParam(ML_FIX_WIDTH,      "Fixed Width",  true);
-        job.addNumericParam(WAVELENGTH,         "Light Wavelength",       550.0,  1, "nanometers");
-        job.addNumericParam(N_APERTURE,         "Numerical Aperture",       1.0,  2, "");
-        job.addNumericParam(USABLE_PIXEL,       "Usable Pixel",            90.0,  1, "%");
-        job.addNumericParam(ML_POS_EPSILON,     "Position Threshold",       0.0001, 4, "nanometers");
-        job.addNumericParam(ML_INT_EPSILON,     "Intensity Threshold",      0.01,  4, "%");
-        job.addNumericParam(ML_WID_EPSILON,     "Width Threshold",          0.0001, 4, "px");
-        job.addNumericParam(ML_MAX_ITERATIONS,  "Maximum Iterations",      50.0,  0, "");
+        job.addLabel("Maximum Likelihood Estimator");
+        job.addCheckboxField(ML_FIX_WIDTH,      "Fixed Width",  true);
+        job.addNumericField(WAVELENGTH,         "Light Wavelength",       550.0,  1, "nanometers");
+        job.addNumericField(N_APERTURE,         "Numerical Aperture",       1.0,  2, "");
+        job.addNumericField(USABLE_PIXEL,       "Usable Pixel",            90.0,  1, "%");
+        job.addNumericField(ML_POS_EPSILON,     "Position Threshold",       0.0001, 4, "nanometers");
+        job.addNumericField(ML_INT_EPSILON,     "Intensity Threshold",      0.01,  4, "%");
+        job.addNumericField(ML_WID_EPSILON,     "Width Threshold",          0.0001, 4, "px");
+        job.addNumericField(ML_MAX_ITERATIONS,  "Maximum Iterations",      50.0,  0, "");
         
-        job.addMessage("Parameter Bounds");
-        job.addNumericParam(ML_MAX_NOISE,       "Max Noise Multiplier",     2.0,  0, "");
-        job.addNumericParam(ML_MIN_NOISE,       "Min Noise Bound",          1.0,  2, "photons");
-        job.addNumericParam(ML_MAX_WIDTH,       "MaxWidth",                 3.0,  2, "px");
-        job.addNumericParam(ML_MIN_WIDTH,       "MinWidth",                 1.5,  2, "px");
+        job.addLabel("Parameter Bounds");
+        job.addNumericField(ML_MAX_NOISE,       "Max Noise Multiplier",     2.0,  0, "");
+        job.addNumericField(ML_MIN_NOISE,       "Min Noise Bound",          1.0,  2, "photons");
+        job.addNumericField(ML_MAX_WIDTH,       "MaxWidth",                 3.0,  2, "px");
+        job.addNumericField(ML_MIN_WIDTH,       "MinWidth",                 1.5,  2, "px");
         
-        job.addMessage("Sample Rendering");
-        job.addCheckboxParam(RENDER_ENABLED,    "Enable rendering", false);
-        job.addNumericParam(RENDER_SCALE,       "Render scale",             4.0,  4, "");
+        job.addLabel("Sample Rendering");
+        job.addCheckboxField(RENDER_ENABLED,    "Enable rendering", false);
+        job.addNumericField(RENDER_SCALE,       "Render scale",             4.0,  4, "");
         
-        job.addMessage(String.format("Version: %s", VERSION));
+        job.addLabel(String.format("Version: %s", VERSION));
     }
 }

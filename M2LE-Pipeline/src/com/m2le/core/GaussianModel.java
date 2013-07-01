@@ -21,13 +21,27 @@ import static java.lang.Math.log;
 import static java.lang.Math.sqrt;
 import static java.lang.Math.exp;
 
-
+/**
+ * Functions related to the gaussian model used to estimate molecule positions.
+ * @author Shane Stahlheber
+ *
+ */
 public final class GaussianModel {
     
     private GaussianModel() { }
     
     private static final double SQRTPI = sqrt(PI);
     
+    /**
+     * 
+     * @param position the estimated center of the molecule.
+     * @param parameters an object of current parameters.
+     * @param windowsize the size of the window.
+     * @param wavenumber the wavenumber of light used (and NA).
+     * @param pixelsize the size of the pixel (in nm).
+     * @param usablepixel the fraction of usable pixel.
+     * @return the partial expected value.
+     */
     public static double getPartialExpected(
             final double position, 
             final Parameters parameters, 
@@ -187,7 +201,7 @@ public final class GaussianModel {
         
         double logLikelihood = 0;
         
-        for (int n = 0; n < signal.size(); n++) {
+        for (int n = 0; n < signal.getSize(); n++) {
             
             final double expected = 
                     getFullExpected(signal.getPosition(n), 
@@ -215,7 +229,7 @@ public final class GaussianModel {
         final double[] secondL = new double[4];
         
         // compute the log-likelihood derivatives
-        for (int n = 0; n < signal.size(); n++) {
+        for (int n = 0; n < signal.getSize(); n++) {
             final double expected = 
                     getFullExpected(signal.getPosition(n), 
                                     parameters, 

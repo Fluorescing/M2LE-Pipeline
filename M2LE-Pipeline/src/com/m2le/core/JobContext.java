@@ -29,11 +29,12 @@ import ij.gui.GenericDialog;
 /**
  * Keeps track of job-specific information, including preference setting/saving
  * and debugging information.
+ * @author Shane Stahlheber
  */
 public class JobContext {
     
     public enum Type {
-        NUMERIC, MESSAGE, CHECKBOX, CHOICE
+        NUMERIC, LABEL, CHECKBOX, CHOICE
     }
     
     private class Parameter {
@@ -53,18 +54,34 @@ public class JobContext {
     private final Map<String,String>  mChoice   = new HashMap<String,String>();
     private boolean mCanceled = false;
     
+    /**
+     * Checks if the job has been canceled .
+     * @return true if canceled; false otherwise.
+     */
     public boolean isCanceled() {
         return mCanceled;
     }
     
-    public void addMessage(final String message) {
+    /**
+     * Add a label to the job setup dialog box.
+     * @param label the text of the label.
+     */
+    public void addLabel(final String label) {
         final Parameter param = new Parameter();
-        param.type = Type.MESSAGE;
-        param.name = message;
+        param.type = Type.LABEL;
+        param.name = label;
         mList.add(param);
     }
     
-    public void addNumericParam(
+    /**
+     * Add a numeric parameter to the job.
+     * @param id the id of the job parameter.
+     * @param name the name of the job parameter.
+     * @param defaultValue the default value.
+     * @param precision the decimal precision.
+     * @param units the units of the job parameter.
+     */
+    public void addNumericField(
             final String id, 
             final String name, 
             final double defaultValue, 
@@ -80,7 +97,13 @@ public class JobContext {
         mList.add(param);
     }
     
-    public void addCheckboxParam(
+    /**
+     * Add a check-box parameter to the job.
+     * @param id the id of the job parameter.
+     * @param name the name of the job parameter.
+     * @param defaultValue the default value.
+     */
+    public void addCheckboxField(
             final String id, 
             final String name, 
             final boolean defaultValue) {
@@ -92,7 +115,13 @@ public class JobContext {
         mList.add(param);
     }
     
-    public void addChoiceParam(
+    /**
+     * Add a combo-box parameter to the job.
+     * @param id the id of the job parameter.
+     * @param name the name of the job parameter.
+     * @param defaultValue the default value.
+     */
+    public void addComboboxField(
             final String id, 
             final String name, 
             final String[] choices) {
@@ -104,19 +133,29 @@ public class JobContext {
         mList.add(param);
     }
     
+    /**
+     * @param id the identification of the field.
+     * @return the numerical value of the field.
+     */
     public double getNumericValue(final String id) {
         return mNumeric.get(id);
     }
     
+    /**
+     * @param id the identification of the field.
+     * @return the check-box value of the field.
+     */
     public boolean getCheckboxValue(final String id) {
         return mCheckbox.get(id);
     }
     
-    public String getChoice(final String id) {
+    /**
+     * @param id the identification of the field.
+     * @return the combo-box choice of the field.
+     */
+    public String getComboboxChoice(final String id) {
         return mChoice.get(id);
     }
-    
-    
     
     // create and show the preference dialog to the user
     private GenericDialog createDialog() {
@@ -128,7 +167,7 @@ public class JobContext {
         
         for (Parameter param : mList) {
             switch (param.type) {
-            case MESSAGE:
+            case LABEL:
                 dialog.addMessage(param.name, header);
                 break;
             case NUMERIC:
@@ -195,12 +234,14 @@ public class JobContext {
         }
     }
     
-    // log preferences and setup debug stats
+    /**
+     * log preferences and setup debug statistics.
+     */
     public void logParameters() {
         
         for (Parameter param : mList) {
             switch (param.type) {
-            case MESSAGE:
+            case LABEL:
                 IJ.log(String.format("==%s==", param.name));
                 break;
             case NUMERIC:
@@ -219,7 +260,7 @@ public class JobContext {
     }
     
     /**
-     * 
+     * Initialize the job.
      * @return the new job context.
      */
     public void initialize() {

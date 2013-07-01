@@ -16,6 +16,11 @@
 
 package com.m2le.core;
 
+/**
+ * The estimate class which holds information pertaining to the estimates.
+ * @author Shane Stahlheber
+ *
+ */
 public class Estimate implements Comparable<Estimate> {
     private int x;
     private int y;
@@ -47,13 +52,22 @@ public class Estimate implements Comparable<Estimate> {
     private boolean hasDistance;
     private double centerDistance;
     
-    // end of stream
+    /**
+     * Constructor; End of Stream.  Tells an iterator to stop.
+     */
     public Estimate() {
         this.hasDistance = false;
         this.eos = true;
         this.slice = Integer.MAX_VALUE;
     }
     
+    /**
+     * New estimate; constructor.
+     * @param x the x-th column
+     * @param y the y-th row
+     * @param slice the image slice
+     * @param signal the intensity of the pixel at (x,y)
+     */
     public Estimate(int x, int y, int slice, double signal) {
         this.hasDistance = false;
         this.eos = false;
@@ -64,10 +78,18 @@ public class Estimate implements Comparable<Estimate> {
         this.rejected = false;
     }
     
+    /**
+     * Checks if the estimate indicates the end of the queue.
+     * @return tells the iterator to stop iterating.
+     */
     public boolean isEndOfQueue() {
         return eos;
     }
     
+    /**
+     * Computes the distance from the estimated center to the actual region center.
+     * @return the distance from the estimate to the region center.
+     */
     public double getDistanceFromCenter() {
         // calculate the distance to center if not already done
         if (!hasDistance) {
@@ -80,68 +102,120 @@ public class Estimate implements Comparable<Estimate> {
         return centerDistance;
     }
     
-    public int getX() {
+    /**
+     * @return the column of the center pixel.
+     */
+    public int getColumn() {
         return x;
     }
 
-    public int getY() {
+    /**
+     * @return the row of the center pixel.
+     */
+    public int getRow() {
         return y;
     }
 
-    public int getSlice() {
+    /**
+     * @return the slice where the estimate is.
+     */
+    public int getSliceIndex() {
         return slice;
     }
 
+    /**
+     * @return the signal at the center pixel.
+     */
     public double getSignal() {
         return signal;
     }
 
+    /**
+     * @return the eccentricity of the region.
+     */
     public double getEccentricity() {
         return eccentricity;
     }
     
+    /**
+     * @return the major-axis of the "elliptical" region.
+     */
     public double getMajorAxis() {
         return major;
     }
     
+    /**
+     * @return the minor-axis of the "elliptical" region.
+     */
     public double getMinorAxis() {
         return minor;
     }
     
-    public void reject() {
+    /**
+     * Make rejected.
+     */
+    public void markRejected() {
         this.rejected = true;
     }
     
-    public void unreject() {
+    /**
+     * Forgive.
+     */
+    public void unmarkRejected() {
         this.rejected = false;
     }
     
-    public boolean passed() {
+    /**
+     * Check if passed.
+     * @return true if passed; false otherwise.
+     */
+    public boolean hasPassed() {
         return !rejected;
     }
     
+    /**
+     * Sets the eccentricity found of the estimate.
+     * @param eccentricity the eccentricity of the region.
+     */
     public void setEccentricity(double eccentricity) {
         this.eccentricity = eccentricity;
     }
     
+    /**
+     * Sets the major- and minor-axis of the "elliptical" region.
+     * @param major the major-axis.
+     * @param minor the minor-axis.
+     */
     public void setAxis(double major, double minor) {
         this.major = major;
         this.minor = minor;
     }
 
-    public double getXEstimate() {
+    /**
+     * @return the x-coordinate of the estimated molecule position.
+     */
+    public double getX() {
         return estrx;
     }
 
-    public void setXEstimate(double estrx) {
+    /**
+     * @param estrx the x-coordinate of the estimated molecule position.
+     */
+    public void setX(double estrx) {
         this.estrx = estrx;
     }
 
-    public double getYEstimate() {
+    /**
+     * @return the y-coordinate of the estimated molecule position.
+     */
+    public double getY() {
         return estry;
     }
 
-    public void setYEstimate(double estry) {
+    /**
+     * @param estry the y-coordinate of the estimated molecule position.
+     */
+    public void setY(double estry) {
         this.estry = estry;
     }
 
@@ -195,9 +269,9 @@ public class Estimate implements Comparable<Estimate> {
 
     @Override
     public int compareTo(Estimate o) {
-        if (this.getSlice() == o.getSlice())
+        if (this.getSliceIndex() == o.getSliceIndex())
             return 0;
-        else if (this.getSlice() > o.getSlice())
+        else if (this.getSliceIndex() > o.getSliceIndex())
             return 1;
         else
             return -1;

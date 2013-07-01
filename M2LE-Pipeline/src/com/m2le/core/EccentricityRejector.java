@@ -25,16 +25,32 @@ import ij.IJ;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
+/**
+ * Class to reject estimates based on eccentricity/ellipticity.
+ * @author Shane Stahlheber
+ *
+ */
 public final class EccentricityRejector {
     
     private EccentricityRejector() { };
     
+    /**
+     * A runnable class for multi-threaded rejection.
+     * @author Shane Stahlheber
+     *
+     */
     public static class RejectionThread implements Runnable {
         
         private StackContext stack;
         private BlockingQueue<Estimate> pixels;
         private BlockingQueue<Estimate> eccpixels;
         
+        /**
+         * Constructor
+         * @param stack the stack of images
+         * @param pixels the initial estimates; interesting pixels
+         * @param eccpixels estimates which pass the eccentricity test
+         */
         public RejectionThread(final StackContext stack, final BlockingQueue<Estimate> pixels, final BlockingQueue<Estimate> eccpixels) {
             this.stack = stack;
             this.pixels = pixels;
@@ -44,6 +60,7 @@ public final class EccentricityRejector {
         @Override
         public void run() {
             
+            // check if eccentricity-based rejection is disabled; still run
             final boolean disabled = stack.getJobContext().getCheckboxValue(UserParams.ECC_DISABLED);
             
             // check all potential pixels
@@ -61,8 +78,8 @@ public final class EccentricityRejector {
                     updatePixel(stack, pixel);
                     
                     // put it back if it survived
-                    if (pixel.passed() || disabled) {
-                        pixel.unreject();
+                    if (pixel.hasPassed() || disabled) {
+                        pixel.unmarkRejected();
                         eccpixels.put(pixel);
                     }
                     
@@ -73,6 +90,12 @@ public final class EccentricityRejector {
         }      
     }
     
+    /**
+     * 
+     * @param stack the stack of images
+     * @param pixels a list of segmented estimates (interesting pixels)
+     * @return a list of segmented final estimates.
+     */
     public static List<BlockingQueue<Estimate>> findSubset(final StackContext stack, final List<BlockingQueue<Estimate>> pixels) {
         
         final int numCPU = ThreadHelper.getProcessorCount();
@@ -100,12 +123,12 @@ public final class EccentricityRejector {
     
     private static void updatePixel(final StackContext stack, final Estimate pixel) {
     
-        final ImageProcessor ip = stack.getImageProcessor(pixel.getSlice());
+        final ImageProcessor ip = stack.getImageProcessor(pixel.getSliceIndex());
         final JobContext job = stack.getJobContext();
         
         // get the window dimensions
-        final int x = pixel.getX();
-        final int y = pixel.getY();
+        final int x = pixel.getColumn();
+        final int y = pixel.getRow();
         
         // get the pixel scaling
         int saturation = 65535;
@@ -137,6 +160,6 @@ public final class EccentricityRejector {
         
         // check if the pixel should be rejected
         if (eccentricity >= threshold) 
-            pixel.reject();
+            pixel.markRejected();
     }
 }

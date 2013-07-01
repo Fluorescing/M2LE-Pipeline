@@ -61,8 +61,8 @@ public final class ThirdMomentRejector {
                     updatePixel(stack, estimate);
                     
                     // put it back if it survived
-                    if (estimate.passed() || disabled) {
-                        estimate.unreject();
+                    if (estimate.hasPassed() || disabled) {
+                        estimate.unmarkRejected();
                         finalestimates.put(estimate);
                     }
                     
@@ -101,7 +101,7 @@ public final class ThirdMomentRejector {
     
     private static void updatePixel(final StackContext stack, final Estimate estimate) {
     
-        final ImageProcessor ip = stack.getImageProcessor(estimate.getSlice());
+        final ImageProcessor ip = stack.getImageProcessor(estimate.getSliceIndex());
         final JobContext job = stack.getJobContext();
         
         // get the pixel scaling
@@ -111,8 +111,8 @@ public final class ThirdMomentRejector {
         final double scale = saturation / job.getNumericValue(UserParams.SATURATION);
         
         // get the window dimensions
-        final int x = estimate.getX();
-        final int y = estimate.getY();
+        final int x = estimate.getColumn();
+        final int y = estimate.getRow();
         
         final double effwavelength = job.getNumericValue(UserParams.WAVELENGTH) 
                 / (job.getNumericValue(UserParams.PIXEL_SIZE) * job.getNumericValue(UserParams.N_APERTURE));
@@ -130,7 +130,7 @@ public final class ThirdMomentRejector {
         final double threshold = StaticMath.calculateThirdThreshold(intensity, acceptance*100.0);
         
         // compute eigenvalues
-        final double[] centroid = new double[] {estimate.getXEstimate(), estimate.getYEstimate()};
+        final double[] centroid = new double[] {estimate.getX(), estimate.getY()};
         final double[] sumdiff = StaticMath.calculateMonteCarloThirdMoments(ip, centroid, left, right, top, bottom, noise, effwavelength, width, scale);
         
         // save major/minor axis and eccentricity
@@ -141,6 +141,6 @@ public final class ThirdMomentRejector {
         
         // check if the pixel should be rejected
         if ((thirddiff*thirddiff + thirdsum*thirdsum) >= threshold) 
-            estimate.reject();
+            estimate.markRejected();
     }
 }

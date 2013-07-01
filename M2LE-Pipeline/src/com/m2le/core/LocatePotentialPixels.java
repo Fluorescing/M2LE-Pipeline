@@ -25,6 +25,11 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * 
+ * @author Shane Stahlheber
+ *
+ */
 public final class LocatePotentialPixels {
     
     private LocatePotentialPixels() { }

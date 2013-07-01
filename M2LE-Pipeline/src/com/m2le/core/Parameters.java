@@ -19,6 +19,7 @@ package com.m2le.core;
 /**
  * This is a vector-type for the parameter space used for the Gaussian model.
  * @see GaussianModel
+ * @author Shane Stahlheber
  */
 public class Parameters {
     
@@ -71,7 +72,7 @@ public class Parameters {
         // estimate intensity
         this.intensity = (StaticMath.max(signal) - StaticMath.min(signal))
                         / StaticMath.max(GaussianModel.getPartialExpectedArray(
-                                                signal.size(), this, 
+                                                signal.getSize(), this, 
                                                 length, wavenumber, 
                                                 pixelsize, usablepixel));
     }

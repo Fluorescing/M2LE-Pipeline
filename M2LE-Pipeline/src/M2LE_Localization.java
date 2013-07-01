@@ -62,7 +62,7 @@ public class M2LE_Localization implements PlugIn {
         final boolean debugMode = job.getCheckboxValue(UserParams.DEBUG_MODE);
         ResultsTable debugTable = null;
         
-        final String debugTableTitle = job.getChoice(UserParams.DB_TABLE);
+        final String debugTableTitle = job.getComboboxChoice(UserParams.DB_TABLE);
         if (!debugTableTitle.equals("")) {
             final TextPanel tp = ((TextWindow) WindowManager.getFrame(debugTableTitle)).getTextPanel();
             debugTable = (tp == null) ? null : tp.getResultsTable();
@@ -130,8 +130,8 @@ public class M2LE_Localization implements PlugIn {
                 
                 // accumulate image
                 if (render && rendering != null) {
-                    final int x = (int) (estimate.getXEstimate()*rscale);
-                    final int y = (int) (estimate.getYEstimate()*rscale);
+                    final int x = (int) (estimate.getX()*rscale);
+                    final int y = (int) (estimate.getY()*rscale);
                     if (x >= 0 && x < rwidth && y >= 0 && y < rheight)
                         rendering[y][x] += 1;
                 }
@@ -220,11 +220,11 @@ public class M2LE_Localization implements PlugIn {
         
         // add result
         results.incrementCounter();
-        results.addValue("Frame", estimate.getSlice());
-        results.addValue("x (px)", estimate.getXEstimate());
-        results.addValue("y (px)", estimate.getYEstimate());
-        results.addValue("x (nm)", estimate.getXEstimate()*pixelSize);
-        results.addValue("y (nm)", estimate.getYEstimate()*pixelSize);
+        results.addValue("Frame", estimate.getSliceIndex());
+        results.addValue("x (px)", estimate.getX());
+        results.addValue("y (px)", estimate.getY());
+        results.addValue("x (nm)", estimate.getX()*pixelSize);
+        results.addValue("y (nm)", estimate.getY()*pixelSize);
         results.addValue("Intensity x", estimate.getIntensityEstimateX());
         results.addValue("Intensity y", estimate.getIntensityEstimateY());
         results.addValue("Background x", estimate.getBackgroundEstimateX());
@@ -235,8 +235,8 @@ public class M2LE_Localization implements PlugIn {
         if (debugMode) {
             results.addValue("Minor Axis", estimate.getMinorAxis());
             results.addValue("Major Axis", estimate.getMajorAxis());
-            results.addValue("ROI x", estimate.getX()+0.5);
-            results.addValue("ROI y", estimate.getY()+0.5);
+            results.addValue("ROI x", estimate.getColumn()+0.5);
+            results.addValue("ROI y", estimate.getRow()+0.5);
             
             results.addValue("thirdsum", estimate.getThirdMomentSum());
             results.addValue("thirddiff", estimate.getThirdMomentDiff());
@@ -244,7 +244,7 @@ public class M2LE_Localization implements PlugIn {
             if (debugTable != null) {
                 for (int column = 0; debugTable.columnExists(column); column++) {
                     final String name = "D_"+debugTable.getColumnHeading(column);
-                    final double value = debugTable.getValueAsDouble(column, estimate.getSlice()-1);
+                    final double value = debugTable.getValueAsDouble(column, estimate.getSliceIndex()-1);
                     results.addValue(name, value);
                 }
             }

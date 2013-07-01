@@ -23,6 +23,11 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * 
+ * @author Shane Stahlheber
+ *
+ */
 public final class RemoveDuplicates {
     
     private RemoveDuplicates() { };
@@ -60,8 +65,8 @@ public final class RemoveDuplicates {
                         break;
                     
                     // check the current slice (reset grid if new slice)
-                    if (estimate.getSlice() != slice) {
-                        slice = estimate.getSlice();
+                    if (estimate.getSliceIndex() != slice) {
+                        slice = estimate.getSliceIndex();
                         for (int x = 0; x < W; x++) {
                             for (int y = 0; y < H; y++) {
                                 grid[x][y] = null;
@@ -70,23 +75,23 @@ public final class RemoveDuplicates {
                     }
                     
                     // check for a conflict
-                    Estimate compare = grid[estimate.getX()][estimate.getY()];
+                    Estimate compare = grid[estimate.getColumn()][estimate.getRow()];
                     if (compare != null) {
                         // choose the lesser of the two center displacements
                         if (compare.getDistanceFromCenter() < estimate.getDistanceFromCenter()) {
                             
                             // replace estimate
-                            estimate.reject();
+                            estimate.markRejected();
                             
                         } else {
                             
-                            compare.reject();
+                            compare.markRejected();
                             
                             // clear grid
-                            final int CW = Math.min(W, compare.getX() + 4);
-                            final int CH = Math.min(H, compare.getY() + 4);
-                            for (int x = Math.max(0, compare.getX()-3); x < CW; x++) {
-                                for (int y = Math.max(0, compare.getY()-3); y < CH; y++) {
+                            final int CW = Math.min(W, compare.getColumn() + 4);
+                            final int CH = Math.min(H, compare.getRow() + 4);
+                            for (int x = Math.max(0, compare.getColumn()-3); x < CW; x++) {
+                                for (int y = Math.max(0, compare.getRow()-3); y < CH; y++) {
                                     if (grid[x][y] == compare)
                                         grid[x][y] = null;
                                 }
@@ -95,17 +100,17 @@ public final class RemoveDuplicates {
                     }
                     
                     // put marker down
-                    final int EW = Math.min(W, estimate.getX() + 4);
-                    final int EH = Math.min(H, estimate.getY() + 4);
-                    for (int x = Math.max(0, estimate.getX()-3); x < EW; x++) {
-                        for (int y = Math.max(0, estimate.getY()-3); y < EH; y++) {
+                    final int EW = Math.min(W, estimate.getColumn() + 4);
+                    final int EH = Math.min(H, estimate.getRow() + 4);
+                    for (int x = Math.max(0, estimate.getColumn()-3); x < EW; x++) {
+                        for (int y = Math.max(0, estimate.getRow()-3); y < EH; y++) {
                             if (grid[x][y] == null || (grid[x][y] != null && estimate.getDistanceFromCenter() < grid[x][y].getDistanceFromCenter()))
                                 grid[x][y] = estimate;
                         }
                     }
                     
                     // put it back if it survived
-                    if (estimate.passed())
+                    if (estimate.hasPassed())
                         reduced.put(estimate);
                     
                 } catch (InterruptedException e) {
@@ -140,7 +145,7 @@ public final class RemoveDuplicates {
                         break;
                     
                     // put it back if it survived
-                    if (estimate.passed())
+                    if (estimate.hasPassed())
                         finalreduced.put(estimate);
                     
                 } catch (InterruptedException e) {

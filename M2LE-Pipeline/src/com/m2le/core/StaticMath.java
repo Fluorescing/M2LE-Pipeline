@@ -71,7 +71,7 @@ public final class StaticMath {
     public static double min(final SignalArray array) {
         double min = array.get(0);
         
-        for (int i = 1; i < array.size(); i++) {
+        for (int i = 1; i < array.getSize(); i++) {
             if (array.get(i) < min) {
                 min = array.get(i);
             }
@@ -87,7 +87,7 @@ public final class StaticMath {
     public static double max(final SignalArray array) {
         double max = array.get(0);
         
-        for (int i = 1; i < array.size(); i++) {
+        for (int i = 1; i < array.getSize(); i++) {
             if (array.get(i) > max) {
                 max = array.get(i);
             }
@@ -146,7 +146,7 @@ public final class StaticMath {
         double center = 0;
         double sum = 0;
         
-        for (int i = 0; i < signal.size(); i++) {
+        for (int i = 0; i < signal.getSize(); i++) {
             center += Math.max(signal.get(i) - noise, 0)*signal.getPosition(i);
             sum += Math.max(signal.get(i) - noise, 0);
         }
@@ -310,14 +310,14 @@ public final class StaticMath {
     
     public static double estimateNoise(final StackContext stack, final Estimate pixel, final double scale) {
         
-        final ImageProcessor ip = stack.getImageProcessor(pixel.getSlice());
+        final ImageProcessor ip = stack.getImageProcessor(pixel.getSliceIndex());
         
         double noiseEstimate = -1.0;
         
-        final int left = Math.max(0, pixel.getX() - 3);
-        final int right = Math.min(ip.getWidth(), pixel.getX() + 4);
-        final int top = Math.max(0, pixel.getY() - 3);
-        final int bottom = Math.min(ip.getHeight(), pixel.getY() + 4);
+        final int left = Math.max(0, pixel.getColumn() - 3);
+        final int right = Math.min(ip.getWidth(), pixel.getColumn() + 4);
+        final int top = Math.max(0, pixel.getRow() - 3);
+        final int bottom = Math.min(ip.getHeight(), pixel.getRow() + 4);
         
         for (int x = left; x < right; x++) {
             double tempnoise = 0.0;
