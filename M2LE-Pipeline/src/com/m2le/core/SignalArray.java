@@ -23,7 +23,9 @@ package com.m2le.core;
  */
 public class SignalArray {
     
+    /** The signal array. */
     public double[] mSignal;
+    
     private final double[] mPosition;
     
     /**
@@ -79,6 +81,8 @@ public class SignalArray {
     }
     
     /**
+     * Gets the size.
+     *
      * @return the size of the array.
      */
     public int getSize() {

@@ -25,22 +25,44 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * The Class ThirdMomentRejector.  This class rejects molecule images based on 
+ * the third-moments.
+ */
 public final class ThirdMomentRejector {
 
     private ThirdMomentRejector() { }
     
+    /**
+     * The Class ThirdRejectionThread.
+     */
     public static class ThirdRejectionThread implements Runnable {
         
+        /** The image stack. */
         private StackContext stack;
+        
+        /** The estimates. */
         private BlockingQueue<Estimate> estimates;
+        
+        /** The final estimates. */
         private BlockingQueue<Estimate> finalestimates;
         
+        /**
+         * Instantiates a new third rejection thread.
+         *
+         * @param stack the image stack
+         * @param estimates the estimates
+         * @param finalestimates the final estimates
+         */
         public ThirdRejectionThread(final StackContext stack, final BlockingQueue<Estimate> estimates, final BlockingQueue<Estimate> finalestimates) {
             this.stack = stack;
             this.estimates = estimates;
             this.finalestimates = finalestimates;
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.Runnable#run()
+         */
         @Override
         public void run() {
             
@@ -58,7 +80,7 @@ public final class ThirdMomentRejector {
                         break;
                     
                     // process the pixel
-                    updatePixel(stack, estimate);
+                    updateEstimate(stack, estimate);
                     
                     // put it back if it survived
                     if (estimate.hasPassed() || disabled) {
@@ -73,6 +95,13 @@ public final class ThirdMomentRejector {
         }      
     }
     
+    /**
+     * Find the subset which passes the third-moment shape test.
+     *
+     * @param stack the image stack
+     * @param estimates the estimates
+     * @return the subset of passed images
+     */
     public static List<BlockingQueue<Estimate>> findSubset(final StackContext stack, final List<BlockingQueue<Estimate>> estimates) {
         
         final int numCPU = ThreadHelper.getProcessorCount();
@@ -99,7 +128,13 @@ public final class ThirdMomentRejector {
         return finalestimates;
     }
     
-    private static void updatePixel(final StackContext stack, final Estimate estimate) {
+    /**
+     * Update the estimate.
+     *
+     * @param stack the image stack
+     * @param estimate the estimate
+     */
+    private static void updateEstimate(final StackContext stack, final Estimate estimate) {
     
         final ImageProcessor ip = stack.getImageProcessor(estimate.getSliceIndex());
         final JobContext job = stack.getJobContext();

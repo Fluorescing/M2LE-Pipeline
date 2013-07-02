@@ -23,27 +23,43 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+// TODO: Auto-generated Javadoc
 /**
- * 
- * @author Shane Stahlheber
+ * The Class RemoveDuplicates.
  *
+ * @author Shane Stahlheber
  */
 public final class RemoveDuplicates {
     
     private RemoveDuplicates() { };
     
+    /**
+     * The Class FirstPassThread.
+     */
     public static class FirstPassThread implements Runnable {
         
         private StackContext stack;
+        
         private BlockingQueue<Estimate> estimates;
+        
         private BlockingQueue<Estimate> reduced;
         
+        /**
+         * Instantiates a new first-pass thread.
+         *
+         * @param stack the image stack
+         * @param estimates the estimates
+         * @param reduced the reduced estimates
+         */
         public FirstPassThread(final StackContext stack, final BlockingQueue<Estimate> estimates, final BlockingQueue<Estimate> reduced) {
             this.stack = stack;
             this.estimates = estimates;
             this.reduced = reduced;
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.Runnable#run()
+         */
         @Override
         public void run() {
             
@@ -120,16 +136,29 @@ public final class RemoveDuplicates {
         }      
     }
     
+    /**
+     * The Class SecondPassThread.
+     */
     public static class SecondPassThread implements Runnable {
         
         private BlockingQueue<Estimate> reduced;
+        
         private BlockingQueue<Estimate> finalreduced;
         
+        /**
+         * Instantiates a new second pass thread.
+         *
+         * @param reduced the reduced
+         * @param finalreduced the final reduced estimates
+         */
         public SecondPassThread(final BlockingQueue<Estimate> reduced, final BlockingQueue<Estimate> finalreduced) {
             this.reduced = reduced;
             this.finalreduced = finalreduced;
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.Runnable#run()
+         */
         @Override
         public void run() {
             
@@ -155,6 +184,13 @@ public final class RemoveDuplicates {
         }      
     }
     
+    /**
+     * Find subset.
+     *
+     * @param stack the stack
+     * @param estimates the estimates
+     * @return the list
+     */
     public static List<BlockingQueue<Estimate>> findSubset(final StackContext stack, final List<BlockingQueue<Estimate>> estimates) {
         
         final int numCPU = ThreadHelper.getProcessorCount();

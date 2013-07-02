@@ -23,15 +23,26 @@ import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 
 /**
+ * The Class StackContext.
+ *
  * @author Shane Stahlheber
  */
 public class StackContext {
     
     private final ImageStack mStack;
+    
     private final JobContext mJob;
+    
     private boolean mFailed;
     
+    /**
+     * Instantiates a new stack context.
+     *
+     * @param job the job context
+     */
     public StackContext(final JobContext job) {
+        
+        // get the image and check if it exists (is there an image open?)
         ImagePlus imp = IJ.getImage();
         
         if (imp == null) {
@@ -43,6 +54,7 @@ public class StackContext {
             mFailed = false;
         }
         
+        // determine the image type (We like grayscale images best)
         switch (imp.getType()) {
           case ImagePlus.GRAY8:
           case ImagePlus.GRAY16:
@@ -63,26 +75,57 @@ public class StackContext {
         mJob = job;
     }
     
-    public boolean loadFailed() {
+    /**
+     * Checks if the job has failed.
+     *
+     * @return true if successful; false otherwise
+     */
+    public boolean stackFailed() {
         return mFailed;
     }
     
+    /**
+     * Gets the image stack width.
+     *
+     * @return the image stack width
+     */
     public int getWidth() {
         return mStack.getWidth();
     }
     
+    /**
+     * Gets the image stack height.
+     *
+     * @return the image stack height
+     */
     public int getHeight() {
         return mStack.getHeight();
     }
     
+    /**
+     * Gets the number of images in the stack.
+     *
+     * @return the number of images in the stack
+     */
     public int getSize() {
         return mStack.getSize();
     }
     
+    /**
+     * Gets the image processor.
+     *
+     * @param index the index of the slice
+     * @return the image processor of the slice
+     */
     public ImageProcessor getImageProcessor(final int index) {
         return mStack.getProcessor(index);
     }
     
+    /**
+     * Gets the job context.
+     *
+     * @return the job context
+     */
     public JobContext getJobContext() {
         return mJob;
     }

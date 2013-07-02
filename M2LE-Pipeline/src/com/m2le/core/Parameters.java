@@ -23,10 +23,18 @@ package com.m2le.core;
  */
 public class Parameters {
     
+    /** The position. */
     public double position;
+    
+    /** The intensity. */
     public double intensity;
+    
+    /** The background. */
     public double background;
+    
+    /** The width. */
     public double width;
+    
     private boolean fixedwidth = false;
     
     /**
@@ -81,10 +89,12 @@ public class Parameters {
     
     /**
      * Constructs a parameter vector with the following values.
+     *
      * @param position the position estimate (nanometers)
      * @param intensity the intensity coefficient (arbitrary units)
      * @param background the background noise level (photons per pixel)
      * @param width the width of the molecule (arbitrary units)
+     * @param fixwidth the fixwidth
      */
     public Parameters(
             final double position, 
@@ -100,7 +110,8 @@ public class Parameters {
     }
     
     /**
-     * Sets the parameters to (original - delta*coefficient)
+     * Sets the parameters to (original - delta*coefficient).
+     *
      * @param original the previous parameter values
      * @param delta the change in the parameters
      * @param coefficient the fraction of the change to make
@@ -132,6 +143,14 @@ public class Parameters {
         this.fixedwidth = parameters.fixedwidth;
     }
     
+    /**
+     * Sets the.
+     *
+     * @param position the position
+     * @param intensity the intensity
+     * @param background the background
+     * @param width the width
+     */
     public void set(final double position, 
             final double intensity, 
             final double background, 
@@ -142,6 +161,15 @@ public class Parameters {
         this.width = width;
     }
     
+    /**
+     * Sets the.
+     *
+     * @param position the position
+     * @param intensity the intensity
+     * @param background the background
+     * @param width the width
+     * @param fixedwidth the fixedwidth
+     */
     public void set(final double position, 
                     final double intensity, 
                     final double background, 

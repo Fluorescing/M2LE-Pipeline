@@ -71,7 +71,7 @@ public class M2LE_Localization implements PlugIn {
         // load the image stack
         final StackContext stack = new StackContext(job);
         
-        if (stack.loadFailed()) {
+        if (stack.stackFailed()) {
             IJ.showMessage("M2LE Warning", "No images to analyze!");
             return;
         }

@@ -23,6 +23,11 @@ import java.awt.Frame;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This non-instantiable class contains information on the user-set 
+ * @author Shane Stahlheber
+ *
+ */
 public final class UserParams {
     
     private UserParams() { }
@@ -140,7 +145,7 @@ public final class UserParams {
         
         job.addLabel("Debug Options");
         job.addCheckboxField(DEBUG_MODE,        "Debug Mode",   false);
-        job.addComboboxField(DB_TABLE,            "Debug Table",  tables);
+        job.addComboboxField(DB_TABLE,          "Debug Table",  tables);
         
         job.addLabel("Molecule Rejection");
         job.addNumericField(ECC_THRESHOLD,      "Eccentricity Threshold",    .9,  2, "");

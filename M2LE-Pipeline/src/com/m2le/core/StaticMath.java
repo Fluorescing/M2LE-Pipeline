@@ -20,13 +20,22 @@ import java.util.Random;
 
 import ij.process.ImageProcessor;
 
-//TODO: Remove the dependence on global noise estimates.
+/**
+ * The Class StaticMath.  This class contains commonly used mathematical functions.
+ */
 public final class StaticMath {
     
     private StaticMath() { }
     
     private static Random rand = new Random(System.currentTimeMillis());
     
+    /**
+     * Calculate the eccentricity threshold.  
+     *
+     * @param photons the photon count per region
+     * @param acc the single-molecule acceptance rate
+     * @return the threshold
+     */
     public static double calculateThreshold(double photons, double acc) {
         
         final double x0h = acc - 89.952;
@@ -38,7 +47,15 @@ public final class StaticMath {
         return A/Math.sqrt(photons - x0) + y0;
     }
     
+    /**
+     * Calculate third-moment threshold.
+     *
+     * @param photons the photon count per region
+     * @param acc the single-molecule acceptance rate
+     * @return the threshold
+     */
     public static double calculateThirdThreshold(double photons, double acc) {
+        
         final double A = 5.5801 + (-2.078e+5)/((acc - 147.95)*(acc - 147.95) - 1909.1);
         final double x0 = -5135.6 + acc*(423.24 + acc*(-13.961 + acc*(0.22529 + acc*(-0.0017943 + acc*(5.648e-6)))));
         final double y0 = -0.55942 + 30822.0/((acc - 183.86)*(acc - 183.86) - 6524.8);
@@ -46,6 +63,18 @@ public final class StaticMath {
         return A/Math.sqrt(photons - x0) + y0;
     }
 
+    /**
+     * Estimate the photon count of the region.
+     *
+     * @param ip the image processor
+     * @param left the left coordinate
+     * @param right the right coordinate
+     * @param top the top coordinate
+     * @param bottom the bottom coordinate
+     * @param noise the background noise per pixel
+     * @param scale the photon count scaling
+     * @return the estimated photon count per region (excluding background)
+     */
     public static double estimatePhotonCount(
             final ImageProcessor ip,
             final int left, final int right, 
@@ -65,7 +94,9 @@ public final class StaticMath {
     }
     
     /**
-     * @param array
+     * The minimum value in the SignalArray.
+     *
+     * @param array the signal array
      * @return the minimum value in the array
      */
     public static double min(final SignalArray array) {
@@ -81,7 +112,9 @@ public final class StaticMath {
     }
     
     /**
-     * @param array
+     * The maximum value in the SignalArray.
+     *
+     * @param array the signal array
      * @return the maximum value in the array
      */
     public static double max(final SignalArray array) {
@@ -96,9 +129,17 @@ public final class StaticMath {
         return max;
     }
     
-    // fractional error less than x.xx * 10 ^ -4.
-    // Algorithm 26.2.17 in Abromowitz and Stegun, Handbook of Mathematical.
-    // http://introcs.cs.princeton.edu/java/21function/ErrorFunction.java.html
+    /**
+     * Error function.
+     * <p>
+     * Accuracy: fractional error less than x.xx * 10 ^ -4.
+     * <p>
+     * Source: Algorithm 26.2.17 in Abromowitz and Stegun, Handbook of Mathematical,
+     * [http://introcs.cs.princeton.edu/java/21function/ErrorFunction.java.html].
+     *
+     * @param z z
+     * @return erf(z)
+     */
     public static double erf(final double z) {
         final double t = 1.0 / (1.0 + 0.47047 * ((z<0)?-z:z));
         final double poly = t * (0.3480242 + t * (-0.0958798 + t * (0.7478556)));
@@ -111,9 +152,10 @@ public final class StaticMath {
     }
 
     /**
-     * fast error function approximation
-     * @param x
-     * @return the value of the error function
+     * Fast error function approximation.
+     *
+     * @param x x
+     * @return erf(x)
      */
     public static double erf2(final double x) {
         double v;
@@ -142,6 +184,13 @@ public final class StaticMath {
         return result;
     }
     
+    /**
+     * Estimate the center.
+     *
+     * @param signal the signal array
+     * @param noise the background photon count per pixel
+     * @return the estimated center
+     */
     public static double estimateCenter(final SignalArray signal, final double noise) {
         double center = 0;
         double sum = 0;
@@ -154,6 +203,18 @@ public final class StaticMath {
         return center / sum;
     }
 
+    /**
+     * Estimate the centroid.
+     *
+     * @param ip the image processor
+     * @param left the left coordinate
+     * @param right the right coordinate
+     * @param top the top coordinate
+     * @param bottom the bottom coordinate
+     * @param noise the background photon count per pixel
+     * @param scale the photon count scaling
+     * @return a two-value array representing the coordinate (x,y)
+     */
     public static double[] estimateCentroid(
             final ImageProcessor ip,
             final int left, final int right, 
@@ -183,6 +244,19 @@ public final class StaticMath {
         return centroid;
     }
 
+    /**
+     * Estimate the second-moments.
+     *
+     * @param ip the image processor
+     * @param centroid the centroid
+     * @param left the left coordinate
+     * @param right the right coordinate
+     * @param top the top coordinate
+     * @param bottom the bottom coordinate
+     * @param noise the background photon count per pixel
+     * @param scale the photon count scaling
+     * @return a three-value array containing the second moments (XX, YY, XY)
+     */
     public static double[] estimateSecondMoments(
             final ImageProcessor ip, 
             final double[] centroid, 
@@ -219,14 +293,41 @@ public final class StaticMath {
         return moment;
     }
     
+    /**
+     * Gets the third-moment summation scaling.
+     *
+     * @param intensity the photon count per region
+     * @return the third-moment summation scaling
+     */
     public static double getThirdMomentSumScaling(double intensity) {
-        return 10.246 + 0.1697*intensity + 1.7027e-5*intensity*intensity + 9.3532e-13*intensity*intensity*intensity;
+        return 10.246 + (0.1697 + (1.7027e-5 + 9.3532e-13*intensity)*intensity)*intensity;
     }
     
+    /**
+     * Gets the third-moment difference scaling.
+     *
+     * @param intensity the photon count per region
+     * @return the third moment difference scaling
+     */
     public static double getThirdMomentDiffScaling(double intensity) {
-        return 41.227 + 0.64077*intensity + 3.6687e-6*intensity*intensity + 1.7874e-12*intensity*intensity*intensity;
+        return 41.227 + (0.64077 + (3.6687e-6 + 1.7874e-12*intensity)*intensity)*intensity;
     }
     
+    /**
+     * Calculate the third-moments using a Monte-Carlo method.
+     *
+    * @param ip the image processor
+     * @param centroid the centroid
+     * @param left the left coordinate
+     * @param right the right coordinate
+     * @param top the top coordinate
+     * @param bottom the bottom coordinate
+     * @param noise the background photon count per pixel
+     * @param wavelength the wavelength of light used
+     * @param width the width of the point spread function
+     * @param scale the photon count scaling
+     * @return a two-value array of the independent third-moments (sum, diff)
+     */
     public static double[] calculateMonteCarloThirdMoments(
             final ImageProcessor ip, 
             final double[] centroid, 
@@ -295,6 +396,12 @@ public final class StaticMath {
         return new double[] {sum, diff};
     }
 
+    /**
+     * Finds the eigen values of the moments given; (xx, yy, xy) -> [[xx yx],[xy yy]].
+     *
+     * @param moment the second-moments of the region
+     * @return a two-value array containing the major- and minor-axis, respectively
+     */
     public static double[] findEigenValues(final double[] moment) {
         
         final double[] eigenValues = {0.0, 0.0};
@@ -308,6 +415,14 @@ public final class StaticMath {
         return eigenValues;
     } 
     
+    /**
+     * Estimates the noise.
+     *
+     * @param stack the image stack
+     * @param pixel the interesting pixel
+     * @param scale the photon count scaling
+     * @return the background noise estimate
+     */
     public static double estimateNoise(final StackContext stack, final Estimate pixel, final double scale) {
         
         final ImageProcessor ip = stack.getImageProcessor(pixel.getSliceIndex());

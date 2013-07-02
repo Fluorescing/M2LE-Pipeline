@@ -21,14 +21,27 @@ import java.util.concurrent.BlockingQueue;
 
 import ij.IJ;
 
+/**
+ * The Class ThreadHelper.
+ */
 public final class ThreadHelper {
     
     private ThreadHelper() { }
     
+    /**
+     * Gets the number of processor cores available.
+     *
+     * @return the processor count
+     */
     public static int getProcessorCount() {
         return Runtime.getRuntime().availableProcessors();
     }
     
+    /**
+     * Mark the end of queue.
+     *
+     * @param estimates the estimates
+     */
     public static void markEndOfQueue(List<BlockingQueue<Estimate>> estimates) {
         // mark the end of the queue
         int numCPU = ThreadHelper.getProcessorCount();
@@ -37,10 +50,20 @@ public final class ThreadHelper {
             estimates.get(n).add(new Estimate());
     }
     
+    /**
+     * Mark the end of queue (single-thread).
+     *
+     * @param estimates the estimates
+     */
     public static void markEndOfQueueSingle(BlockingQueue<Estimate> estimates) {
         estimates.add(new Estimate());
     }
     
+    /**
+     * Start threads.
+     *
+     * @param threads the threads
+     */
     public static void startThreads(final Thread[] threads) {
         
         // start the threads
