@@ -33,7 +33,7 @@ public final class UserParams {
     private UserParams() { }
     
     /** The current version of the plugin. */
-    public static final String VERSION = "1.1.15";
+    public static final String VERSION = "1.1.16";
     
     /** The signal-to-noise ratio multiple threshold. */
     public static final String SN_RATIO = "M2LEPL.IA.SNC";
@@ -138,7 +138,7 @@ public final class UserParams {
         final String[] tables = getResultsTables();
         
         job.addLabel("Image Analysis");
-        job.addNumericField(SN_RATIO,           "SignalNoise Cutoff",       4.0,  2, "");
+        job.addNumericField(SN_RATIO,           "SignalNoise Cutoff",       3.0,  2, "");
         job.addNumericField(LOWEST_NOISE_EST,   "Lowest Noise Estimate",    2.0,  0, "photons");
         job.addNumericField(PIXEL_SIZE,         "Pixel Size",             110.0,  2, "nanometers");
         job.addNumericField(SATURATION,         "Saturation Point",     65535.0,  2, "DN");
@@ -148,10 +148,10 @@ public final class UserParams {
         job.addComboboxField(DB_TABLE,          "Debug Table",  tables);
         
         job.addLabel("Molecule Rejection");
-        job.addNumericField(ECC_THRESHOLD,      "Eccentricity Threshold",    .9,  2, "");
-        job.addNumericField(THRD_THRESHOLD,     "Third Moment Threshold",    .9,  2, "");
+        job.addNumericField(ECC_THRESHOLD,      "Eccentricity Threshold",    .9,  2, "0 to 1");
+        job.addNumericField(THRD_THRESHOLD,     "Third Moment Threshold",    .95,  2, "0 to 1");
         job.addCheckboxField(ECC_DISABLED,      "Disable Ellipticity Rejector", false);
-        job.addCheckboxField(THRD_DISABLED,     "Disable_Third Moment Rejector", false);
+        job.addCheckboxField(THRD_DISABLED,     "Disable_Third Moment Rejector", true);
         
         job.addLabel("Maximum Likelihood Estimator");
         job.addCheckboxField(ML_FIX_WIDTH,      "Fixed Width",  true);
@@ -166,12 +166,12 @@ public final class UserParams {
         job.addLabel("Parameter Bounds");
         job.addNumericField(ML_MAX_NOISE,       "Max Noise Multiplier",     2.0,  0, "");
         job.addNumericField(ML_MIN_NOISE,       "Min Noise Bound",          1.0,  2, "photons");
-        job.addNumericField(ML_MAX_WIDTH,       "MaxWidth",                 3.0,  2, "px");
-        job.addNumericField(ML_MIN_WIDTH,       "MinWidth",                 1.5,  2, "px");
+        job.addNumericField(ML_MAX_WIDTH,       "MaxWidth",                 6.0,  2, "px");
+        job.addNumericField(ML_MIN_WIDTH,       "MinWidth",                 1.2,  2, "px");
         
         job.addLabel("Sample Rendering");
         job.addCheckboxField(RENDER_ENABLED,    "Enable rendering", false);
-        job.addNumericField(RENDER_SCALE,       "Render scale",             4.0,  4, "");
+        job.addNumericField(RENDER_SCALE,       "Render scale",             4.0,  0, "x Original");
         
         job.addLabel(String.format("Version: %s", VERSION));
     }
