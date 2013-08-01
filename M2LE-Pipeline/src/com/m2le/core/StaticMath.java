@@ -423,11 +423,12 @@ public final class StaticMath {
      * @param scale the photon count scaling
      * @return the background noise estimate
      */
-    public static double estimateNoise(final StackContext stack, final Estimate pixel, final double scale) {
+    public static double estimateNoise(final ImageProcessor ip, final StackContext stack, final Estimate pixel, final double scale) {
         
-        final ImageProcessor ip = stack.getImageProcessor(pixel.getSliceIndex());
+        //final ImageProcessor ip = stack.getImageProcessor(pixel.getSliceIndex());
         
         double noiseEstimate = -1.0;
+        double tempnoise;
         
         final int left = Math.max(0, pixel.getColumn() - 3);
         final int right = Math.min(ip.getWidth(), pixel.getColumn() + 4);
@@ -435,7 +436,7 @@ public final class StaticMath {
         final int bottom = Math.min(ip.getHeight(), pixel.getRow() + 4);
         
         for (int x = left; x < right; x++) {
-            double tempnoise = 0.0;
+            tempnoise = 0.0;
             for (int y = top; y < bottom; y++) {
                 tempnoise += ip.get(x, y) / scale;
             }
@@ -446,7 +447,7 @@ public final class StaticMath {
         }
         
         for (int y = top; y < bottom; y++) {
-            double tempnoise = 0.0;
+            tempnoise = 0.0;
             for (int x = left; x < right; x++) {
                 tempnoise += ip.get(x, y) / scale;
             }
@@ -457,5 +458,16 @@ public final class StaticMath {
         }
         
         return noiseEstimate;
+    }
+    
+    /**
+     * Calculates the percent difference between a and b.
+     * @param a a
+     * @param b b
+     * @return the percent difference
+     */
+    public static double percentDifference(final double a, final double b) {
+        final double c = 2. * (a - b) / (a + b);
+        return (c < 0.) ? -c : c;
     }
 }

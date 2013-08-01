@@ -159,7 +159,7 @@ public final class ThirdMomentRejector {
         final int top      = Math.max(0, y - 3);
         final int bottom   = Math.min(ip.getHeight(), y + 4);
         
-        final double noise = StaticMath.estimateNoise(stack, estimate, scale);
+        final double noise = StaticMath.estimateNoise(ip, stack, estimate, scale);
         final double acceptance = job.getNumericValue(UserParams.THRD_THRESHOLD);
         final double intensity = StaticMath.estimatePhotonCount(ip, left, right, top, bottom, noise, scale);
         final double threshold = StaticMath.calculateThirdThreshold(intensity, acceptance*100.0);

@@ -16,40 +16,78 @@
 
 package com.m2le.core;
 
+// TODO: Auto-generated Javadoc
 /**
  * The estimate class which holds information pertaining to the estimates.
  * @author Shane Stahlheber
  *
  */
 public class Estimate implements Comparable<Estimate> {
+    
+    /** The x. */
     private int x;
+    
+    /** The y. */
     private int y;
+    
+    /** The slice. */
     private int slice;
+    
+    /** The signal. */
     private double signal;
     
+    /** The eccentricity. */
     private double eccentricity;
+    
+    /** The major. */
     private double major;
+    
+    /** The minor. */
     private double minor;
     
+    /** The thirdmomentsum. */
     private double thirdmomentsum;
+    
+    /** The thirdmomentdiff. */
     private double thirdmomentdiff;
     
+    /** The hu. */
     private double[] hu = new double[8];
     
+    /** The estrx. */
     private double estrx;
+    
+    /** The estry. */
     private double estry;
+    
+    /** The est ix. */
     private double estIx;
+    
+    /** The est iy. */
     private double estIy;
+    
+    /** The estbx. */
     private double estbx;
+    
+    /** The estby. */
     private double estby;
+    
+    /** The estwx. */
     private double estwx;
+    
+    /** The estwy. */
     private double estwy;
 
+    /** The rejected. */
     private boolean rejected;
     
+    /** The eos. */
     private boolean eos;
     
+    /** The has distance. */
     private boolean hasDistance;
+    
+    /** The center distance. */
     private double centerDistance;
     
     /**
@@ -103,6 +141,8 @@ public class Estimate implements Comparable<Estimate> {
     }
     
     /**
+     * Gets the column.
+     *
      * @return the column of the center pixel.
      */
     public int getColumn() {
@@ -110,6 +150,8 @@ public class Estimate implements Comparable<Estimate> {
     }
 
     /**
+     * Gets the row.
+     *
      * @return the row of the center pixel.
      */
     public int getRow() {
@@ -117,6 +159,8 @@ public class Estimate implements Comparable<Estimate> {
     }
 
     /**
+     * Gets the slice index.
+     *
      * @return the slice where the estimate is.
      */
     public int getSliceIndex() {
@@ -124,6 +168,8 @@ public class Estimate implements Comparable<Estimate> {
     }
 
     /**
+     * Gets the signal.
+     *
      * @return the signal at the center pixel.
      */
     public double getSignal() {
@@ -131,6 +177,8 @@ public class Estimate implements Comparable<Estimate> {
     }
 
     /**
+     * Gets the eccentricity.
+     *
      * @return the eccentricity of the region.
      */
     public double getEccentricity() {
@@ -138,6 +186,8 @@ public class Estimate implements Comparable<Estimate> {
     }
     
     /**
+     * Gets the major axis.
+     *
      * @return the major-axis of the "elliptical" region.
      */
     public double getMajorAxis() {
@@ -145,6 +195,8 @@ public class Estimate implements Comparable<Estimate> {
     }
     
     /**
+     * Gets the minor axis.
+     *
      * @return the minor-axis of the "elliptical" region.
      */
     public double getMinorAxis() {
@@ -192,6 +244,8 @@ public class Estimate implements Comparable<Estimate> {
     }
 
     /**
+     * Gets the x.
+     *
      * @return the x-coordinate of the estimated molecule position.
      */
     public double getX() {
@@ -199,6 +253,8 @@ public class Estimate implements Comparable<Estimate> {
     }
 
     /**
+     * Sets the x.
+     *
      * @param estrx the x-coordinate of the estimated molecule position.
      */
     public void setX(double estrx) {
@@ -206,6 +262,8 @@ public class Estimate implements Comparable<Estimate> {
     }
 
     /**
+     * Gets the y.
+     *
      * @return the y-coordinate of the estimated molecule position.
      */
     public double getY() {
@@ -213,60 +271,125 @@ public class Estimate implements Comparable<Estimate> {
     }
 
     /**
+     * Sets the y.
+     *
      * @param estry the y-coordinate of the estimated molecule position.
      */
     public void setY(double estry) {
         this.estry = estry;
     }
 
+    /**
+     * Gets the intensity estimate x.
+     *
+     * @return the intensity estimate x
+     */
     public double getIntensityEstimateX() {
         return estIx;
     }
 
+    /**
+     * Sets the intensity estimate x.
+     *
+     * @param estIx the new intensity estimate x
+     */
     public void setIntensityEstimateX(double estIx) {
         this.estIx = estIx;
     }
 
+    /**
+     * Gets the intensity estimate y.
+     *
+     * @return the intensity estimate y
+     */
     public double getIntensityEstimateY() {
         return estIy;
     }
 
+    /**
+     * Sets the intensity estimate y.
+     *
+     * @param estIy the new intensity estimate y
+     */
     public void setIntensityEstimateY(double estIy) {
         this.estIy = estIy;
     }
 
+    /**
+     * Gets the background estimate x.
+     *
+     * @return the background estimate x
+     */
     public double getBackgroundEstimateX() {
         return estbx;
     }
 
+    /**
+     * Sets the background estimate x.
+     *
+     * @param estbx the new background estimate x
+     */
     public void setBackgroundEstimateX(double estbx) {
         this.estbx = estbx;
     }
 
+    /**
+     * Gets the background estimate y.
+     *
+     * @return the background estimate y
+     */
     public double getBackgroundEstimateY() {
         return estby;
     }
 
+    /**
+     * Sets the background estimate y.
+     *
+     * @param estby the new background estimate y
+     */
     public void setBackgroundEstimateY(double estby) {
         this.estby = estby;
     }
 
+    /**
+     * Gets the width estimate x.
+     *
+     * @return the width estimate x
+     */
     public double getWidthEstimateX() {
         return estwx;
     }
 
+    /**
+     * Sets the width estimate x.
+     *
+     * @param estwx the new width estimate x
+     */
     public void setWidthEstimateX(double estwx) {
         this.estwx = estwx;
     }
 
+    /**
+     * Gets the width estimate y.
+     *
+     * @return the width estimate y
+     */
     public double getWidthEstimateY() {
         return estwy;
     }
 
+    /**
+     * Sets the width estimate y.
+     *
+     * @param estwy the new width estimate y
+     */
     public void setWidthEstimateY(double estwy) {
         this.estwy = estwy;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     @Override
     public int compareTo(Estimate o) {
         if (this.getSliceIndex() == o.getSliceIndex())
@@ -277,26 +400,58 @@ public class Estimate implements Comparable<Estimate> {
             return -1;
     }
 
+    /**
+     * Gets the third moment sum.
+     *
+     * @return the third moment sum
+     */
     public double getThirdMomentSum() {
         return thirdmomentsum;
     }
 
+    /**
+     * Sets the third moment sum.
+     *
+     * @param thirdmomentsum the new third moment sum
+     */
     public void setThirdMomentSum(double thirdmomentsum) {
         this.thirdmomentsum = thirdmomentsum;
     }
 
+    /**
+     * Gets the third moment diff.
+     *
+     * @return the third moment diff
+     */
     public double getThirdMomentDiff() {
         return thirdmomentdiff;
     }
 
+    /**
+     * Sets the third moment diff.
+     *
+     * @param thirdmomentdiff the new third moment diff
+     */
     public void setThirdMomentDiff(double thirdmomentdiff) {
         this.thirdmomentdiff = thirdmomentdiff;
     }
     
+    /**
+     * Sets the hu.
+     *
+     * @param index the index
+     * @param value the value
+     */
     public void setHu(int index, double value) {
         hu[index] = value;
     }
     
+    /**
+     * Gets the hu.
+     *
+     * @param index the index
+     * @return the hu
+     */
     public double getHu(int index) {
         return hu[index];
     }

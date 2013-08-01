@@ -142,7 +142,7 @@ public final class EccentricityRejector {
         final int top      = Math.max(0, y - 3);
         final int bottom   = Math.min(ip.getHeight(), y + 4);
         
-        final double noise = StaticMath.estimateNoise(stack, pixel, scale);
+        final double noise = StaticMath.estimateNoise(ip, stack, pixel, scale);
         final double acceptance = job.getNumericValue(UserParams.ECC_THRESHOLD);
         final double intensity = StaticMath.estimatePhotonCount(ip, left, right, top, bottom, noise, scale);
         final double threshold = StaticMath.calculateThreshold(intensity, acceptance*100.0);

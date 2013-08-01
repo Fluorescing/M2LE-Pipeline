@@ -25,22 +25,42 @@ import ij.IJ;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MoleculeLocator.  This class contains static procedures for 
+ * localizing single molecules.
+ */
 public final class MoleculeLocator {
     
     private MoleculeLocator() { }
     
+    /**
+     * The Class LocatorThread.
+     */
     public static class LocatorThread implements Runnable {
         
         private StackContext stack;
+        
         private BlockingQueue<Estimate> pixels;
+        
         private BlockingQueue<Estimate> estimates;
         
+        /**
+         * Instantiates a new locator thread.
+         *
+         * @param stack the stack
+         * @param pixels the pixels
+         * @param estimates the estimates
+         */
         public LocatorThread(final StackContext stack, final BlockingQueue<Estimate> pixels, final BlockingQueue<Estimate> estimates) {
             this.stack = stack;
             this.pixels = pixels;
             this.estimates = estimates;
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.Runnable#run()
+         */
         @Override
         public void run() {
             
@@ -69,6 +89,13 @@ public final class MoleculeLocator {
         }      
     }
     
+    /**
+     * Find subset.
+     *
+     * @param stack the stack
+     * @param pixels the pixels
+     * @return the list
+     */
     public static List<BlockingQueue<Estimate>> findSubset(
             final StackContext stack, 
             final List<BlockingQueue<Estimate>> pixels) {
@@ -97,6 +124,22 @@ public final class MoleculeLocator {
         return estimates;
     }
     
+    /**
+     * Do iteration.
+     *
+     * @param stack the image stack
+     * @param estimate the estimate
+     * @param signal the signal array
+     * @param parameters the parameters
+     * @param delta the change in parameter values
+     * @param likelihood the likelihood
+     * @param length the length of the array
+     * @param wavenumber the wavenumber of light used
+     * @param pixelsize the size of the pixel
+     * @param usablepixel the fraction of usable pixel
+     * @param initialnoise the initial noise
+     * @return true if successful; false otherwise
+     */
     private static boolean doIteration(
             final StackContext stack,
             final Estimate estimate,
@@ -110,6 +153,7 @@ public final class MoleculeLocator {
             final double usablepixel,
             final double initialnoise) {
         
+        // get the job settings
         final JobContext job = stack.getJobContext();
         
         final double posthreshold = job.getNumericValue(UserParams.ML_POS_EPSILON);
@@ -119,60 +163,73 @@ public final class MoleculeLocator {
         final double minNoiseBound = job.getNumericValue(UserParams.ML_MIN_NOISE);
         final double maxNoiseMulti = job.getNumericValue(UserParams.ML_MAX_NOISE);
         
-        delta = GaussianModel.computeNewtonRaphson(signal, parameters,
-                                                   delta,
+        // compute the Newton-Raphson parameter change
+        delta = GaussianModel.computeNewtonRaphson(signal, parameters, delta,
                                                    length, wavenumber, 
                                                    pixelsize, usablepixel);
     
+        // coefficient for decaying update
         double coefficient = 1.0;
         
         final Parameters newparameters = new Parameters();
         
+        // loop an arbitrary 10 times (will hopefully only iterate once)
+        // This loop will continue as long as we have a smaller likelihood.
+        // This assumes (with certainty) that the Newton-Raphson method overshoots.
         for (int k = 0; k < 10; k++) {
             
             // update the new parameters
             newparameters.update(parameters, delta, coefficient);
             
+            // ensure that the parameters are within bounds
             if (newparameters.background < minNoiseBound) {
                 newparameters.background = minNoiseBound;
             } else if (newparameters.background > maxNoiseMulti*initialnoise) {
                 newparameters.background = maxNoiseMulti*initialnoise;
             }
             
+            // find the new log-likelihood
             final double newlikelihood = 
                     GaussianModel.computeLogLikelihood(signal, newparameters, 
                                                        length, wavenumber, 
                                                        pixelsize, usablepixel);
         
+            // end the loop if the likelihood increases; otherwise, halve coefficient
             if (newlikelihood > likelihood[0]) {
+                
+                // Oh good! Lets stop.
                 likelihood[0] = newlikelihood;
                 break;
             } else {
+                
+                // The likelihood decreased! Weird...  Try again.
                 coefficient /= 2.0;
             }
         }
         
-        double intdiff = 2.*(parameters.intensity - newparameters.intensity)
-                                / (parameters.intensity + newparameters.intensity);
+        // check end-conditions
+        boolean isDone = false;
         
-        if (intdiff < 0) {
-            intdiff = -intdiff;
-        }
-        
-        if ((delta.position<0?-delta.position:delta.position) < posthreshold) {
-            return true;
-        } else if (intdiff < intthreshold) {
-            return true;
-        } else if ((delta.width<0?-delta.width:delta.width) < widthreshold) {
-            return true;
-        }
-        
+        if (((delta.position < 0) ? -delta.position : delta.position) < posthreshold)
+            isDone = true;
+        else if (StaticMath.percentDifference(parameters.intensity, newparameters.intensity) < intthreshold)
+            isDone = true;
+        else if (((delta.width < 0)? -delta.width : delta.width) < widthreshold)
+            isDone = true;
+       
         // update the final parameters
-        parameters.set(newparameters);
+        if (!isDone) parameters.set(newparameters);
         
-        return false;
+        return isDone;
     }
     
+    /**
+     * Find max likelihood.
+     *
+     * @param stack the stack
+     * @param estimate the estimate
+     * @return the estimate
+     */
     public static Estimate findMaxLikelihood(
             final StackContext stack, 
             final Estimate estimate) {
@@ -185,16 +242,16 @@ public final class MoleculeLocator {
         final double pixelsize = job.getNumericValue(UserParams.PIXEL_SIZE);
         final double usablepixel = job.getNumericValue(UserParams.USABLE_PIXEL)/100.0;
         
+        final int maxIter = (int) job.getNumericValue(UserParams.ML_MAX_ITERATIONS);
+        final double minWidth = job.getNumericValue(UserParams.ML_MIN_WIDTH);
+        final double maxWidth = job.getNumericValue(UserParams.ML_MAX_WIDTH);
+        final boolean fixWidth = job.getCheckboxValue(UserParams.ML_FIX_WIDTH);
+        
         // get the pixel scaling
         int saturation = 65535;
         if (ip instanceof ByteProcessor)
             saturation = 255;
         final double scale = saturation / job.getNumericValue(UserParams.SATURATION);
-        
-        final int maxIter = (int) job.getNumericValue(UserParams.ML_MAX_ITERATIONS);
-        final double minWidth = job.getNumericValue(UserParams.ML_MIN_WIDTH);
-        final double maxWidth = job.getNumericValue(UserParams.ML_MAX_WIDTH);
-        final boolean fixWidth = job.getCheckboxValue(UserParams.ML_FIX_WIDTH);
         
         // center/focus point
         final int cx = estimate.getColumn();
@@ -237,12 +294,10 @@ public final class MoleculeLocator {
                                            width, wavenumber, 
                                            pixelsize, usablepixel, fixWidth);
         
+        // estimate the initial noise level
         final double initialnoise = (xparam.background + yparam.background)/2.;
         
-        
-        boolean xdone = false;
-        boolean ydone = false;
-        
+        // initial likelihood calculations
         final double[] xlikelihood = {
                 GaussianModel.computeLogLikelihood(xsignal, xparam, 
                                                    height, wavenumber, 
@@ -253,10 +308,17 @@ public final class MoleculeLocator {
                                                    width, wavenumber, 
                                                    pixelsize, usablepixel)};
         
+        // used for the change in parameters
         final Parameters delta = new Parameters();
+        
+        // condition flags
+        boolean xdone = false;
+        boolean ydone = false;
         
         // update parameters
         for (int iter = 0; iter < maxIter; iter++) {
+            
+            // do iteration until done
             if (!xdone) {
                 xdone = doIteration(stack, estimate, xsignal, 
                                     xparam, delta, xlikelihood,
@@ -265,6 +327,7 @@ public final class MoleculeLocator {
                                     initialnoise);
             }
             
+            // do iteration until done
             if (!ydone) {
                 ydone = doIteration(stack, estimate, ysignal, 
                                     yparam, delta, ylikelihood,
@@ -273,6 +336,7 @@ public final class MoleculeLocator {
                                     initialnoise);
             }
             
+            // end the loop when both are done
             if (xdone && ydone) {
                 break;
             }
@@ -284,12 +348,14 @@ public final class MoleculeLocator {
             return estimate;
         }
         
+        // check that the position estimate is within the region
         if (xparam.position < 0. || xparam.position > pixelsize*width ||
                 yparam.position < 0. || yparam.position > pixelsize*height) {
             estimate.markRejected();
             return estimate;
         }
         
+        // check that the width of the PSF is within acceptable bounds
         if (xparam.width < minWidth || xparam.width > maxWidth
                 || yparam.width < minWidth || yparam.width > maxWidth) {
             estimate.markRejected();

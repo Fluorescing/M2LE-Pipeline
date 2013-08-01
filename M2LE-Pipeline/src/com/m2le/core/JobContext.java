@@ -45,6 +45,8 @@ public class JobContext {
     }
     
     private class Parameter {
+        
+        /** The type. */
         public Type type;
         public String id;
         public String name;

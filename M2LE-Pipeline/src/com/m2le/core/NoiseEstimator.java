@@ -18,6 +18,7 @@ import java.util.Arrays;
 
 import ij.process.ImageProcessor;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is a utility class that provides a global noise estimate for a
  * given image context.
@@ -31,6 +32,13 @@ public class NoiseEstimator {
     
     private double[][] noisegrid;
     
+    /**
+     * Instantiates a new noise estimator.
+     *
+     * @param stack the image stack
+     * @param ip the image processor
+     * @param scale the photon count scaling
+     */
     public NoiseEstimator(final StackContext stack, final ImageProcessor ip, final double scale) {
         final JobContext job = stack.getJobContext();
         
@@ -63,6 +71,13 @@ public class NoiseEstimator {
         }
     }
     
+    /**
+     * Gets the noise estimate.
+     *
+     * @param x the x
+     * @param y the y
+     * @return the noise estimate
+     */
     public double getNoiseEstimate(final int x, final int y) {
         final int cx = x / WINDOW;
         final int cy = y / WINDOW;

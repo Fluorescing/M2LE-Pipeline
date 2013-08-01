@@ -22,30 +22,46 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+// TODO: Auto-generated Javadoc
 /**
- * 
- * @author Shane Stahlheber
+ * The Class FunnelEstimates.
  *
+ * @author Shane Stahlheber
  */
 public final class FunnelEstimates {
     
+    /**
+     * Instantiates a new funnel estimates.
+     */
     private FunnelEstimates() { };
     
     /**
-     * 
-     * @author Shane Stahlheber
+     * The Class FunnelThread.
      *
+     * @author Shane Stahlheber
      */
     public static class FunnelThread implements Runnable {
         
+        /** The estimates. */
         private BlockingQueue<Estimate> estimates;
+        
+        /** The funnelled. */
         private BlockingQueue<Estimate> funnelled;
         
+        /**
+         * Instantiates a new funnel thread.
+         *
+         * @param estimates the estimates
+         * @param funnelled the funnelled
+         */
         public FunnelThread(final BlockingQueue<Estimate> estimates, final BlockingQueue<Estimate> funnelled) {
             this.estimates = estimates;
             this.funnelled = funnelled;
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.Runnable#run()
+         */
         @Override
         public void run() {
             
@@ -70,6 +86,13 @@ public final class FunnelEstimates {
         }      
     }
     
+    /**
+     * Find subset.
+     *
+     * @param stack the stack
+     * @param estimates the estimates
+     * @return the blocking queue
+     */
     public static BlockingQueue<Estimate> findSubset(final StackContext stack, final List<BlockingQueue<Estimate>> estimates) {
         
         final int numCPU = ThreadHelper.getProcessorCount();

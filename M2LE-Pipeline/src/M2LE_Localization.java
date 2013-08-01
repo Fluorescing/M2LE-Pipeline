@@ -77,14 +77,14 @@ public class M2LE_Localization implements PlugIn {
         }
         
         // iterate through all images in the stack
+        BlockingQueue<Estimate> funnelled = runPipeline(stack);
+        
+        // show the results
         final ResultsTable results = new ResultsTable();
         results.setPrecision(10);
         
-        BlockingQueue<Estimate> funnelled = runPipeline(stack);
-        
         int SIZE = processResults(job, stack, results, funnelled, debugTable, debugMode);
-        
-        // show the results
+
         results.show("Localization Results");
         
         IJ.showStatus(String.format("%d Localizations.", SIZE));

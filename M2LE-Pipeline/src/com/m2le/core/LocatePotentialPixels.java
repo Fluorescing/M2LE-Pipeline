@@ -25,15 +25,25 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+// TODO: Auto-generated Javadoc
 /**
- * 
- * @author Shane Stahlheber
+ * The Class LocatePotentialPixels.
  *
+ * @author Shane Stahlheber
  */
 public final class LocatePotentialPixels {
     
+    /**
+     * Instantiates a new locate potential pixels.
+     */
     private LocatePotentialPixels() { }
     
+    /**
+     * Find potential pixels.
+     *
+     * @param stack the stack
+     * @return the list
+     */
     public static List<BlockingQueue<Estimate>> findPotentialPixels(StackContext stack) {
         
         final int threads = ThreadHelper.getProcessorCount();

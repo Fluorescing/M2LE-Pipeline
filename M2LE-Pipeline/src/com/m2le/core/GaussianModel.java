@@ -21,6 +21,9 @@ import static java.lang.Math.log;
 import static java.lang.Math.sqrt;
 import static java.lang.Math.exp;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+// TODO: Auto-generated Javadoc
 /**
  * Functions related to the gaussian model used to estimate molecule positions.
  * @author Shane Stahlheber
@@ -28,12 +31,26 @@ import static java.lang.Math.exp;
  */
 public final class GaussianModel {
     
+    static ConcurrentLinkedQueue<double[]> allocations;
+    
+    static {
+        allocations = new ConcurrentLinkedQueue<double[]>();
+        for (int i = 0; i < 100; i++) {
+            allocations.offer(new double[4]);
+        }
+    }
+    
+    /**
+     * Instantiates a new gaussian model.
+     */
     private GaussianModel() { }
     
+    /** The Constant SQRTPI. */
     private static final double SQRTPI = sqrt(PI);
     
     /**
-     * 
+     * Gets the partial expected.
+     *
      * @param position the estimated center of the molecule.
      * @param parameters an object of current parameters.
      * @param windowsize the size of the window.
@@ -61,6 +78,17 @@ public final class GaussianModel {
                          + StaticMath.erf((k*( a/2. + x - x0))/w)))/(2.*k*k);
     }
     
+    /**
+     * Gets the partial expected array.
+     *
+     * @param size the size
+     * @param parameters the parameters
+     * @param windowsize the windowsize
+     * @param wavenumber the wavenumber
+     * @param pixelsize the pixelsize
+     * @param usablepixel the usablepixel
+     * @return the partial expected array
+     */
     public static SignalArray getPartialExpectedArray(
             final int size,
             final Parameters parameters, 
@@ -81,6 +109,17 @@ public final class GaussianModel {
         return expected;
     }
     
+    /**
+     * Gets the full expected.
+     *
+     * @param position the position
+     * @param parameters the parameters
+     * @param windowsize the windowsize
+     * @param wavenumber the wavenumber
+     * @param pixelsize the pixelsize
+     * @param usablepixel the usablepixel
+     * @return the full expected
+     */
     public static double getFullExpected(
             final double position, 
             final Parameters parameters, 
@@ -103,6 +142,17 @@ public final class GaussianModel {
                                /(2.*k*k);
     }
     
+    /**
+     * Gets the first derivatives.
+     *
+     * @param position the position
+     * @param parameters the parameters
+     * @param windowsize the windowsize
+     * @param wavenumber the wavenumber
+     * @param pixelsize the pixelsize
+     * @param usablepixel the usablepixel
+     * @return the first derivatives
+     */
     public static double[] getFirstDerivatives(
             final double position, 
             final Parameters parameters, 
@@ -127,7 +177,7 @@ public final class GaussianModel {
         final double y1p2 = y1*y1;
         final double y2p2 = y2*y2;
         
-        final double[] array = new double[4];
+        final double[] array = allocations.poll();
         
         array[0] = (I0*L*PI*((2*k)/(exp((k2*y2p2)/w2)*SQRTPI*w) - 
                         (2*k)/(exp((k2*y1p2)/w2)*SQRTPI*w))*w2)/(2.*k2);
@@ -142,6 +192,17 @@ public final class GaussianModel {
         return array;
     }
     
+    /**
+     * Gets the second derivatives.
+     *
+     * @param position the position
+     * @param parameters the parameters
+     * @param windowsize the windowsize
+     * @param wavenumber the wavenumber
+     * @param pixelsize the pixelsize
+     * @param usablepixel the usablepixel
+     * @return the second derivatives
+     */
     public static double[] getSecondDerivatives(
             final double position, 
             final Parameters parameters, 
@@ -171,7 +232,7 @@ public final class GaussianModel {
         final double y2p2 = y2*y2;
         final double y2p3 = y2*y2p2;
         
-        final double[] array = new double[4];
+        final double[] array = allocations.poll();
         
         // These are not meant to be human readable. They were
         //   automatically generated and then further optimized.
@@ -191,6 +252,17 @@ public final class GaussianModel {
         return array;
     }
     
+    /**
+     * Compute log likelihood.
+     *
+     * @param signal the signal
+     * @param parameters the parameters
+     * @param windowsize the windowsize
+     * @param wavenumber the wavenumber
+     * @param pixelsize the pixelsize
+     * @param usablepixel the usablepixel
+     * @return the double
+     */
     public static double computeLogLikelihood(
             final SignalArray signal,
             final Parameters parameters,
@@ -199,7 +271,7 @@ public final class GaussianModel {
             final double pixelsize,
             final double usablepixel) {
         
-        double logLikelihood = 0;
+        double logLikelihood = 0.0;
         
         for (int n = 0; n < signal.getSize(); n++) {
             
@@ -215,6 +287,18 @@ public final class GaussianModel {
         return logLikelihood;
     }
 
+    /**
+     * Compute newton raphson.
+     *
+     * @param signal the signal
+     * @param parameters the parameters
+     * @param delta the delta
+     * @param windowsize the windowsize
+     * @param wavenumber the wavenumber
+     * @param pixelsize the pixelsize
+     * @param usablepixel the usablepixel
+     * @return the parameters
+     */
     public static Parameters computeNewtonRaphson(
             final SignalArray signal,
             final Parameters parameters,
@@ -225,8 +309,13 @@ public final class GaussianModel {
             final double usablepixel) {
         
         // allocate first and second derivates of loglikelihood
-        final double[] firstL  = new double[4];
-        final double[] secondL = new double[4];
+        final double[] firstL  = allocations.poll();
+        final double[] secondL = allocations.poll();
+        
+        for (int i = 0; i < 4; i++) {
+            firstL[i] = 0.0;
+            secondL[i] = 0.0;
+        }
         
         // compute the log-likelihood derivatives
         for (int n = 0; n < signal.getSize(); n++) {
@@ -253,6 +342,9 @@ public final class GaussianModel {
                 secondL[i] += (signal.mSignal[n]/expected - 1.)*second[i] 
                        - (signal.mSignal[n]*first[i]*first[i]/(expected*expected));
             }
+            
+            allocations.offer(first);
+            allocations.offer(second);
         }
         
         // compute the recommended change in parameter values
@@ -260,6 +352,9 @@ public final class GaussianModel {
                   firstL[1]/secondL[1],
                   firstL[2]/secondL[2],
                   firstL[3]/secondL[3]);
+        
+        allocations.offer(firstL);
+        allocations.offer(secondL);
         
         return delta;
     }
