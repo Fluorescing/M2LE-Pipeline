@@ -56,7 +56,7 @@ public final class LocatePotentialPixels {
         
         final JobContext job = stack.getJobContext();
         
-        final double snCutoff = job.getNumericValue(UserParams.SN_RATIO);
+        final double snCutoff = job.getNumericValue(UserSettings.SN_RATIO);
         
         // for all slices in the stack
         final int COUNT = stack.getSize();
@@ -70,7 +70,7 @@ public final class LocatePotentialPixels {
             int saturation = 65535;
             if (ip instanceof ByteProcessor)
                 saturation = 255;
-            final double scale = saturation / job.getNumericValue(UserParams.SATURATION);
+            final double scale = saturation / job.getNumericValue(UserSettings.SATURATION);
             
             // estimate noise
             final NoiseEstimator noise = new NoiseEstimator(stack, ip, scale);

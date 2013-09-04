@@ -66,7 +66,7 @@ public class NoiseEstimator {
                 Arrays.sort(sorted);
                 
                 // store the median
-                noisegrid[cx][cy] = Math.max(sorted[WINDOW*WINDOW/2], job.getNumericValue(UserParams.LOWEST_NOISE_EST));
+                noisegrid[cx][cy] = Math.max(sorted[WINDOW*WINDOW/2], job.getNumericValue(UserSettings.LOWEST_NOISE_EST));
             }
         }
     }

@@ -128,7 +128,6 @@ public final class MoleculeLocator {
      * Do iteration.
      *
      * @param stack the image stack
-     * @param estimate the estimate
      * @param signal the signal array
      * @param parameters the parameters
      * @param delta the change in parameter values
@@ -142,7 +141,6 @@ public final class MoleculeLocator {
      */
     private static boolean doIteration(
             final StackContext stack,
-            final Estimate estimate,
             final SignalArray signal,
             final Parameters parameters,
             Parameters delta,
@@ -156,12 +154,12 @@ public final class MoleculeLocator {
         // get the job settings
         final JobContext job = stack.getJobContext();
         
-        final double posthreshold = job.getNumericValue(UserParams.ML_POS_EPSILON);
-        final double intthreshold = job.getNumericValue(UserParams.ML_INT_EPSILON)/100.0;
-        final double widthreshold = job.getNumericValue(UserParams.ML_WID_EPSILON);
+        final double posthreshold = job.getNumericValue(UserSettings.ML_POS_EPSILON);
+        final double intthreshold = job.getNumericValue(UserSettings.ML_INT_EPSILON)/100.0;
+        final double widthreshold = job.getNumericValue(UserSettings.ML_WID_EPSILON);
         
-        final double minNoiseBound = job.getNumericValue(UserParams.ML_MIN_NOISE);
-        final double maxNoiseMulti = job.getNumericValue(UserParams.ML_MAX_NOISE);
+        final double minNoiseBound = job.getNumericValue(UserSettings.ML_MIN_NOISE);
+        final double maxNoiseMulti = job.getNumericValue(UserSettings.ML_MAX_NOISE);
         
         // compute the Newton-Raphson parameter change
         delta = GaussianModel.computeNewtonRaphson(signal, parameters, delta,
@@ -238,20 +236,20 @@ public final class MoleculeLocator {
         final ImageProcessor ip  = stack.getImageProcessor(estimate.getSliceIndex());
         
         // preferences and constants
-        final double wavenumber = 2.0*Math.PI*job.getNumericValue(UserParams.N_APERTURE)/job.getNumericValue(UserParams.WAVELENGTH);
-        final double pixelsize = job.getNumericValue(UserParams.PIXEL_SIZE);
-        final double usablepixel = job.getNumericValue(UserParams.USABLE_PIXEL)/100.0;
+        final double wavenumber = 2.0*Math.PI*job.getNumericValue(UserSettings.N_APERTURE)/job.getNumericValue(UserSettings.WAVELENGTH);
+        final double pixelsize = job.getNumericValue(UserSettings.PIXEL_SIZE);
+        final double usablepixel = job.getNumericValue(UserSettings.USABLE_PIXEL)/100.0;
         
-        final int maxIter = (int) job.getNumericValue(UserParams.ML_MAX_ITERATIONS);
-        final double minWidth = job.getNumericValue(UserParams.ML_MIN_WIDTH);
-        final double maxWidth = job.getNumericValue(UserParams.ML_MAX_WIDTH);
-        final boolean fixWidth = job.getCheckboxValue(UserParams.ML_FIX_WIDTH);
+        final int maxIter = (int) job.getNumericValue(UserSettings.ML_MAX_ITERATIONS);
+        final double minWidth = job.getNumericValue(UserSettings.ML_MIN_WIDTH);
+        final double maxWidth = job.getNumericValue(UserSettings.ML_MAX_WIDTH);
+        final boolean fixWidth = job.getCheckboxValue(UserSettings.ML_FIX_WIDTH);
         
         // get the pixel scaling
         int saturation = 65535;
         if (ip instanceof ByteProcessor)
             saturation = 255;
-        final double scale = saturation / job.getNumericValue(UserParams.SATURATION);
+        final double scale = saturation / job.getNumericValue(UserSettings.SATURATION);
         
         // center/focus point
         final int cx = estimate.getColumn();
@@ -320,7 +318,7 @@ public final class MoleculeLocator {
             
             // do iteration until done
             if (!xdone) {
-                xdone = doIteration(stack, estimate, xsignal, 
+                xdone = doIteration(stack, xsignal,
                                     xparam, delta, xlikelihood,
                                     height, wavenumber, 
                                     pixelsize, usablepixel, 
@@ -329,7 +327,7 @@ public final class MoleculeLocator {
             
             // do iteration until done
             if (!ydone) {
-                ydone = doIteration(stack, estimate, ysignal, 
+                ydone = doIteration(stack, ysignal,
                                     yparam, delta, ylikelihood,
                                     width, wavenumber, 
                                     pixelsize, usablepixel, 

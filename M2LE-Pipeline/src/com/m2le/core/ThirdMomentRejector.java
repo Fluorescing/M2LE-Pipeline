@@ -66,7 +66,7 @@ public final class ThirdMomentRejector {
         @Override
         public void run() {
             
-            final boolean disabled = stack.getJobContext().getCheckboxValue(UserParams.THRD_DISABLED);
+            final boolean disabled = stack.getJobContext().getCheckboxValue(UserSettings.THIRD_DISABLED);
             
             // check all potential pixels
             while (true) {
@@ -143,14 +143,14 @@ public final class ThirdMomentRejector {
         int saturation = 65535;
         if (ip instanceof ByteProcessor)
             saturation = 255;
-        final double scale = saturation / job.getNumericValue(UserParams.SATURATION);
+        final double scale = saturation / job.getNumericValue(UserSettings.SATURATION);
         
         // get the window dimensions
         final int x = estimate.getColumn();
         final int y = estimate.getRow();
         
-        final double effwavelength = job.getNumericValue(UserParams.WAVELENGTH) 
-                / (job.getNumericValue(UserParams.PIXEL_SIZE) * job.getNumericValue(UserParams.N_APERTURE));
+        final double effwavelength = job.getNumericValue(UserSettings.WAVELENGTH)
+                / (job.getNumericValue(UserSettings.PIXEL_SIZE) * job.getNumericValue(UserSettings.N_APERTURE));
         final double width = (estimate.getWidthEstimateX() + estimate.getWidthEstimateY())/2.0;
         
         // prevent out-of-bounds errors
@@ -160,7 +160,7 @@ public final class ThirdMomentRejector {
         final int bottom   = Math.min(ip.getHeight(), y + 4);
         
         final double noise = StaticMath.estimateNoise(ip, stack, estimate, scale);
-        final double acceptance = job.getNumericValue(UserParams.THRD_THRESHOLD);
+        final double acceptance = job.getNumericValue(UserSettings.THIRD_THRESHOLD);
         final double intensity = StaticMath.estimatePhotonCount(ip, left, right, top, bottom, noise, scale);
         final double threshold = StaticMath.calculateThirdThreshold(intensity, acceptance*100.0);
         

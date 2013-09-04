@@ -32,7 +32,7 @@ import ij.process.ImageProcessor;
  */
 public final class EccentricityRejector {
     
-    private EccentricityRejector() { };
+    private EccentricityRejector() { }
     
     /**
      * A runnable class for multi-threaded rejection.
@@ -61,7 +61,7 @@ public final class EccentricityRejector {
         public void run() {
             
             // check if eccentricity-based rejection is disabled; still run
-            final boolean disabled = stack.getJobContext().getCheckboxValue(UserParams.ECC_DISABLED);
+            final boolean disabled = stack.getJobContext().getCheckboxValue(UserSettings.ECC_DISABLED);
             
             // check all potential pixels
             while (true) {
@@ -134,7 +134,7 @@ public final class EccentricityRejector {
         int saturation = 65535;
         if (ip instanceof ByteProcessor)
             saturation = 255;
-        final double scale = saturation / job.getNumericValue(UserParams.SATURATION);
+        final double scale = saturation / job.getNumericValue(UserSettings.SATURATION);
         
         // prevent out-of-bounds errors
         final int left     = Math.max(0, x - 3);
@@ -143,7 +143,7 @@ public final class EccentricityRejector {
         final int bottom   = Math.min(ip.getHeight(), y + 4);
         
         final double noise = StaticMath.estimateNoise(ip, stack, pixel, scale);
-        final double acceptance = job.getNumericValue(UserParams.ECC_THRESHOLD);
+        final double acceptance = job.getNumericValue(UserSettings.ECC_THRESHOLD);
         final double intensity = StaticMath.estimatePhotonCount(ip, left, right, top, bottom, noise, scale);
         final double threshold = StaticMath.calculateThreshold(intensity, acceptance*100.0);
         

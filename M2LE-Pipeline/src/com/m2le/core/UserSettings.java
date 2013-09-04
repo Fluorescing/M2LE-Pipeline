@@ -28,12 +28,12 @@ import java.util.List;
  * @author Shane Stahlheber
  *
  */
-public final class UserParams {
+public final class UserSettings {
     
-    private UserParams() { }
+    private UserSettings() { }
     
     /** The current version of the plugin. */
-    public static final String VERSION = "1.1.16";
+    public static final String VERSION = "1.1.17";
     
     /** The signal-to-noise ratio multiple threshold. */
     public static final String SN_RATIO = "M2LEPL.IA.SNC";
@@ -54,13 +54,13 @@ public final class UserParams {
     public static final String ECC_THRESHOLD = "M2LEPL.MR.ET";
     
     /** The third-moment threshold (single-molecule acceptance rate). */
-    public static final String THRD_THRESHOLD = "M2LEPL.MR.TT";
+    public static final String THIRD_THRESHOLD = "M2LEPL.MR.TT";
     
     /** Option to disable the eccentricity shape test. */
     public static final String ECC_DISABLED = "M2LEPL.MR.DER";
     
     /** Option to disable the third-moment shape test. */
-    public static final String THRD_DISABLED = "M2LEPL.MR.DTR";
+    public static final String THIRD_DISABLED = "M2LEPL.MR.DTR";
     
     /** The wavelength of light used; in nanometers. */
     public static final String WAVELENGTH = "M2LEPL.ML.LW";
@@ -106,7 +106,7 @@ public final class UserParams {
     
     /** The scale of the reconstruction (multiple of the original image size). */
     public static final String RENDER_SCALE = "M2LEPL.RENDERSCALE";
-    
+
     /**
      * Returns a version string containing the major, minor, and build version.
      * @return The version string.
@@ -133,7 +133,7 @@ public final class UserParams {
      * Initialize the user parameters and parameter info for the new job.
      * @param job the job context
      */
-    public static void getUserParameters(final JobContext job) {
+    public static void declareSettings(final JobContext job) {
         
         final String[] tables = getResultsTables();
         
@@ -149,18 +149,18 @@ public final class UserParams {
         
         job.addLabel("Molecule Rejection");
         job.addNumericField(ECC_THRESHOLD,      "Eccentricity Threshold",    .9,  2, "0 to 1");
-        job.addNumericField(THRD_THRESHOLD,     "Third Moment Threshold",    .95,  2, "0 to 1");
+        job.addNumericField(THIRD_THRESHOLD,     "Third Moment Threshold",   .95, 2, "0 to 1");
         job.addCheckboxField(ECC_DISABLED,      "Disable Ellipticity Rejector", false);
-        job.addCheckboxField(THRD_DISABLED,     "Disable_Third Moment Rejector", true);
+        job.addCheckboxField(THIRD_DISABLED,     "Disable_Third Moment Rejector", true);
         
         job.addLabel("Maximum Likelihood Estimator");
         job.addCheckboxField(ML_FIX_WIDTH,      "Fixed Width",  true);
         job.addNumericField(WAVELENGTH,         "Light Wavelength",       550.0,  1, "nanometers");
         job.addNumericField(N_APERTURE,         "Numerical Aperture",       1.0,  2, "");
         job.addNumericField(USABLE_PIXEL,       "Usable Pixel",            90.0,  1, "%");
-        job.addNumericField(ML_POS_EPSILON,     "Position Threshold",       0.0001, 4, "nanometers");
-        job.addNumericField(ML_INT_EPSILON,     "Intensity Threshold",      0.01,  4, "%");
-        job.addNumericField(ML_WID_EPSILON,     "Width Threshold",          0.0001, 4, "px");
+        job.addNumericField(ML_POS_EPSILON,     "Position Threshold",   1.0E-04,  4, "nanometers");
+        job.addNumericField(ML_INT_EPSILON,     "Intensity Threshold",  1.0E-02,  4, "%");
+        job.addNumericField(ML_WID_EPSILON,     "Width Threshold",      1.0E-04,  4, "px");
         job.addNumericField(ML_MAX_ITERATIONS,  "Maximum Iterations",      50.0,  0, "");
         
         job.addLabel("Parameter Bounds");

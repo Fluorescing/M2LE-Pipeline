@@ -17,25 +17,19 @@
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-import com.m2le.core.EccentricityRejector;
-import com.m2le.core.Estimate;
-import com.m2le.core.FunnelEstimates;
-import com.m2le.core.JobContext;
-import com.m2le.core.LocatePotentialPixels;
-import com.m2le.core.MoleculeLocator;
-import com.m2le.core.RemoveDuplicates;
-import com.m2le.core.StackContext;
-import com.m2le.core.ThirdMomentRejector;
-import com.m2le.core.UserParams;
+import com.m2le.core.*;
+import com.m2le.core.UserSettings;
+import static com.m2le.core.UserSettings.DEBUG_MODE;
+import static com.m2le.core.UserSettings.DB_TABLE;
+import static com.m2le.core.UserSettings.PIXEL_SIZE;
 
 import ij.IJ;
-import ij.ImagePlus;
 import ij.WindowManager;
 import ij.measure.ResultsTable;
 import ij.plugin.PlugIn;
-import ij.process.ImageProcessor;
 import ij.text.TextPanel;
 import ij.text.TextWindow;
+
 
 /**
  * The ImageJ plugin class from which the localization job begins.
@@ -51,44 +45,49 @@ public class M2LE_Localization implements PlugIn {
      */
     @Override
     public void run(String arg) {
-        // Get the job from the user
+
         final JobContext job = new JobContext();
-        UserParams.getUserParameters(job);
+        final ResultsTable results = new ResultsTable();
+        results.setPrecision(10);
+
+        // load the image stack
+        final StackContext stack = new StackContext(job);
+        if (stack.stackFailed()) {
+            IJ.showMessage("M2LE-Pipeline Warning", "No images to analyze!");
+            return;
+        }
+
+        // Get the job from the user
+        UserSettings.declareSettings(job);
         job.initialize();
         
         // check if user cancelled
-        if (job.isCanceled()) return;
+        if (job.isCanceled()) {
+            return;
+        }
         
-        final boolean debugMode = job.getCheckboxValue(UserParams.DEBUG_MODE);
+        final boolean debugMode = job.getCheckboxValue(DEBUG_MODE);
         ResultsTable debugTable = null;
-        
-        final String debugTableTitle = job.getComboboxChoice(UserParams.DB_TABLE);
+
+        final String debugTableTitle = job.getComboboxChoice(DB_TABLE);
         if (!debugTableTitle.equals("")) {
             final TextPanel tp = ((TextWindow) WindowManager.getFrame(debugTableTitle)).getTextPanel();
             debugTable = (tp == null) ? null : tp.getResultsTable();
         }
-    
-        // load the image stack
-        final StackContext stack = new StackContext(job);
-        
-        if (stack.stackFailed()) {
-            IJ.showMessage("M2LE Warning", "No images to analyze!");
-            return;
-        }
-        
+
         // iterate through all images in the stack
         BlockingQueue<Estimate> funnelled = runPipeline(stack);
-        
-        // show the results
-        final ResultsTable results = new ResultsTable();
-        results.setPrecision(10);
-        
-        int SIZE = processResults(job, stack, results, funnelled, debugTable, debugMode);
+        final int localizationCount = processResults(job, stack, results, funnelled, debugTable, debugMode);
 
-        results.show("Localization Results");
-        
-        IJ.showStatus(String.format("%d Localizations.", SIZE));
-        IJ.log(String.format("[%d localizations]", SIZE));
+        // display results
+        if (localizationCount == 0) {
+            IJ.log("M2LE-Pipeline: Could not locate any molecules; please review settings.");
+            IJ.showStatus("Nothing found.");
+        } else {
+            IJ.log(String.format("M2LE-Pipeline: There were %d molecules located.", localizationCount));
+            IJ.showStatus(String.format("%d Localizations.", localizationCount));
+            results.show("Localization Results");
+        }
     }
 
     /**
@@ -101,51 +100,47 @@ public class M2LE_Localization implements PlugIn {
      * @param debugMode is debug enabled or disabled
      * @return returns the number of estimates added to the table
      */
-    private static int processResults(final JobContext job, final StackContext stack,
-            final ResultsTable results, BlockingQueue<Estimate> estimates,
-            ResultsTable debugTable, final boolean debugMode) {
-        final double pixelSize = job.getNumericValue(UserParams.PIXEL_SIZE);
-        
-        // should we render an image?
-        final boolean render = job.getCheckboxValue(UserParams.RENDER_ENABLED);
-        final double rscale = job.getNumericValue(UserParams.RENDER_SCALE);
-        
-        final int rwidth = (int) (stack.getWidth()*rscale);
-        final int rheight = (int) (stack.getHeight()*rscale);
-        
-        int[][] rendering = null;
-        if (render)
-            rendering = new int[rheight][rwidth];
-        
+    private static int processResults(final JobContext job,
+                                      final StackContext stack,
+                                      final ResultsTable results,
+                                      BlockingQueue<Estimate> estimates,
+                                      ResultsTable debugTable,
+                                      final boolean debugMode) {
+
+        final double pixelSize = job.getNumericValue(PIXEL_SIZE);
+        final Reconstruction reconstruction = new Reconstruction(job, stack);
+
+        int localizationCount = 0;
+
         // add to results table
-        int SIZE = estimates.size()-1;
         while (true) {
             try {
                 // get pixel
                 final Estimate estimate = estimates.take();
                 
                 // check for the end of the queue
-                if (estimate.isEndOfQueue())
+                if (estimate.isEndOfQueue()) {
                     break;
-                
-                // accumulate image
-                if (render && rendering != null) {
-                    final int x = (int) (estimate.getX()*rscale);
-                    final int y = (int) (estimate.getY()*rscale);
-                    if (x >= 0 && x < rwidth && y >= 0 && y < rheight)
-                        rendering[y][x] += 1;
                 }
                 
+                // accumulate molecule to reconstruction
+                reconstruction.accumulate(estimate.getX(), estimate.getY());
+
+                // add the results to the table
                 addResult(results, estimate, pixelSize, debugTable, debugMode);
+
+                localizationCount++;
                 
             } catch (InterruptedException e) {
                 IJ.handleException(e);
+                break;
             }
         }
         
         // display reconstruction
-        if (render) displayReconstruction(rwidth, rheight, rendering);
-        return SIZE;
+        reconstruction.display();
+
+        return localizationCount;
     }
 
     /**
@@ -156,55 +151,27 @@ public class M2LE_Localization implements PlugIn {
     private static BlockingQueue<Estimate> runPipeline(final StackContext stack) {
         IJ.showProgress(0, 100);
         IJ.showStatus("Locating Potential Molecules...");
-        
-        // find all potential pixels
         List<BlockingQueue<Estimate>> potential = LocatePotentialPixels.findPotentialPixels(stack);
         
         IJ.showProgress(25, 100);
         IJ.showStatus("Testing Eccentricity...");
-        
-        // find subset of potential pixels that pass an eccentricity test
         potential = EccentricityRejector.findSubset(stack, potential);
         
         IJ.showProgress(50, 100);
         IJ.showStatus("Localizing Molecules...");
-        
-        // transform the PE pixels into localization estimates
         List<BlockingQueue<Estimate>> estimates = MoleculeLocator.findSubset(stack, potential);
         
         IJ.showProgress(63, 100);
         IJ.showStatus("Testing Third Moments...");
-        
-        // find subset of potential pixels that pass the third moments test
         estimates = ThirdMomentRejector.findSubset(stack, estimates);
         
         IJ.showProgress(75, 100);
         IJ.showStatus("Removing Duplicates...");
-        
-        // weed out duplicates (choose the estimate carefully)
         estimates = RemoveDuplicates.findSubset(stack, estimates);
         
         IJ.showProgress(100, 100);
         IJ.showStatus("Printing Results...");
-        BlockingQueue<Estimate> funnelled = FunnelEstimates.findSubset(stack, estimates);
-        return funnelled;
-    }
-
-    /**
-     * Displays the reconstructed image.
-     * @param width
-     * @param height
-     * @param image the actual reconstructed image
-     */
-    private static void displayReconstruction(final int width, final int height, int[][] image) {
-        final ImagePlus rimp = IJ.createImage("Sample Rendering", "16-bit", width, height, 1);
-        final ImageProcessor rip = rimp.getProcessor();
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                rip.set(x, y, image[y][x]);
-            }
-        }
-        rimp.show();
+        return FunnelEstimates.findSubset(stack, estimates);
     }
 
     /**
