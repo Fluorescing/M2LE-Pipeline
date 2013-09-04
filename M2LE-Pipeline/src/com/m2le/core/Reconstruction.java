@@ -68,6 +68,7 @@ public class Reconstruction {
                 }
             }
             impRender.show();
+            IJ.resetMinAndMax(impRender);
         }
     }
 
