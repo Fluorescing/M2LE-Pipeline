@@ -88,7 +88,7 @@ public final class LocatePotentialPixels {
                     if (S > noise.getNoiseEstimate(x, y)*snCutoff) {
                         try {
                             final int i = Math.min(threads*slice/COUNT, threads-1);
-                            pixels.get(i).put(new Estimate(x, y, slice, S));
+                            pixels.get(i).put(new Estimate(x, y, slice));
                         } catch (InterruptedException e) {
                             IJ.handleException(e);
                         }

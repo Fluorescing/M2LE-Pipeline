@@ -151,7 +151,7 @@ public final class ThirdMomentRejector {
         
         final double effwavelength = job.getNumericValue(UserSettings.WAVELENGTH)
                 / (job.getNumericValue(UserSettings.PIXEL_SIZE) * job.getNumericValue(UserSettings.N_APERTURE));
-        final double width = (estimate.getWidthEstimateX() + estimate.getWidthEstimateY())/2.0;
+        final double width = (estimate.getWidth() + estimate.getHeight())/2.0;
         
         // prevent out-of-bounds errors
         final int left     = Math.max(0, x - 3);

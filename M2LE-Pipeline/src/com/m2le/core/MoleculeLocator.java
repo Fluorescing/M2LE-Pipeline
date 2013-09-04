@@ -361,14 +361,14 @@ public final class MoleculeLocator {
         }
         
         // record information
-        estimate.setX(xparam.position/pixelsize + left); 
+        estimate.setX(xparam.position / pixelsize + left);
         estimate.setY(yparam.position/pixelsize + top);
-        estimate.setIntensityEstimateX(xparam.intensity);
-        estimate.setIntensityEstimateY(yparam.intensity);
-        estimate.setBackgroundEstimateX(xparam.background);
-        estimate.setBackgroundEstimateY(yparam.background);
-        estimate.setWidthEstimateX(xparam.width);
-        estimate.setWidthEstimateY(yparam.width);
+        estimate.setHorizontalIntensity(xparam.intensity);
+        estimate.setVerticalIntensity(yparam.intensity);
+        estimate.setHorizontalBackground(xparam.background);
+        estimate.setVerticalBackground(yparam.background);
+        estimate.setWidth(xparam.width);
+        estimate.setHeight(yparam.width);
         
         return estimate;
     }

@@ -192,12 +192,12 @@ public class M2LE_Localization implements PlugIn {
         results.addValue("y (px)", estimate.getY());
         results.addValue("x (nm)", estimate.getX()*pixelSize);
         results.addValue("y (nm)", estimate.getY()*pixelSize);
-        results.addValue("Intensity x", estimate.getIntensityEstimateX());
-        results.addValue("Intensity y", estimate.getIntensityEstimateY());
-        results.addValue("Background x", estimate.getBackgroundEstimateX());
-        results.addValue("Background y", estimate.getBackgroundEstimateY());
-        results.addValue("Width x", estimate.getWidthEstimateX());
-        results.addValue("Width y", estimate.getWidthEstimateY());
+        results.addValue("Intensity x", estimate.getHorizontalIntensity());
+        results.addValue("Intensity y", estimate.getVerticalIntensity());
+        results.addValue("Background x", estimate.getHorizontalBackground());
+        results.addValue("Background y", estimate.getVerticalBackground());
+        results.addValue("Width x", estimate.getWidth());
+        results.addValue("Width y", estimate.getHeight());
         
         if (debugMode) {
             results.addValue("Minor Axis", estimate.getMinorAxis());

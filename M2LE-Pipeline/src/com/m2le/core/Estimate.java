@@ -25,17 +25,14 @@ package com.m2le.core;
 public class Estimate implements Comparable<Estimate> {
     
     /** The x. */
-    private int x;
+    private int column;
     
     /** The y. */
-    private int y;
+    private int row;
     
     /** The slice. */
     private int slice;
-    
-    /** The signal. */
-    private double signal;
-    
+
     /** The eccentricity. */
     private double eccentricity;
     
@@ -45,44 +42,41 @@ public class Estimate implements Comparable<Estimate> {
     /** The minor. */
     private double minor;
     
-    /** The thirdmomentsum. */
-    private double thirdmomentsum;
+    /** The thirdMomentSum. */
+    private double thirdMomentSum;
     
-    /** The thirdmomentdiff. */
-    private double thirdmomentdiff;
+    /** The thirdMomentDiff. */
+    private double thirdMomentDiff;
     
-    /** The hu. */
-    private double[] hu = new double[8];
+    /** The x estimate. */
+    private double x;
     
-    /** The estrx. */
-    private double estrx;
+    /** The y estimate. */
+    private double y;
     
-    /** The estry. */
-    private double estry;
+    /** The horizontal intensity estimate. */
+    private double horizontalIntensity;
     
-    /** The est ix. */
-    private double estIx;
+    /** The vertical intensity estimate. */
+    private double verticalIntensity;
     
-    /** The est iy. */
-    private double estIy;
+    /** The horizontal background estimate. */
+    private double horizontalBackground;
     
-    /** The estbx. */
-    private double estbx;
+    /** The vertical background estimate. */
+    private double verticalBackground;
     
-    /** The estby. */
-    private double estby;
+    /** The width estimate. */
+    private double width;
     
-    /** The estwx. */
-    private double estwx;
-    
-    /** The estwy. */
-    private double estwy;
+    /** The height estimate. */
+    private double height;
 
     /** The rejected. */
     private boolean rejected;
     
-    /** The eos. */
-    private boolean eos;
+    /** The isQueueTerminator. */
+    private boolean isQueueTerminator;
     
     /** The has distance. */
     private boolean hasDistance;
@@ -95,24 +89,22 @@ public class Estimate implements Comparable<Estimate> {
      */
     public Estimate() {
         this.hasDistance = false;
-        this.eos = true;
+        this.isQueueTerminator = true;
         this.slice = Integer.MAX_VALUE;
     }
     
     /**
      * New estimate; constructor.
-     * @param x the x-th column
-     * @param y the y-th row
+     * @param column the column
+     * @param row the row
      * @param slice the image slice
-     * @param signal the intensity of the pixel at (x,y)
      */
-    public Estimate(int x, int y, int slice, double signal) {
+    public Estimate(int column, int row, int slice) {
         this.hasDistance = false;
-        this.eos = false;
-        this.x = x;
-        this.y = y; 
+        this.isQueueTerminator = false;
+        this.column = column;
+        this.row = row;
         this.slice = slice;
-        this.signal = signal;
         this.rejected = false;
     }
     
@@ -121,7 +113,7 @@ public class Estimate implements Comparable<Estimate> {
      * @return tells the iterator to stop iterating.
      */
     public boolean isEndOfQueue() {
-        return eos;
+        return isQueueTerminator;
     }
     
     /**
@@ -131,8 +123,8 @@ public class Estimate implements Comparable<Estimate> {
     public double getDistanceFromCenter() {
         // calculate the distance to center if not already done
         if (!hasDistance) {
-            final double dx = estrx - (0.5+x);
-            final double dy = estry - (0.5+y);
+            final double dx = x - (0.5+column);
+            final double dy = y - (0.5+row);
             centerDistance = Math.sqrt(dx*dx + dy*dy);
             hasDistance = true;
         }
@@ -146,7 +138,7 @@ public class Estimate implements Comparable<Estimate> {
      * @return the column of the center pixel.
      */
     public int getColumn() {
-        return x;
+        return column;
     }
 
     /**
@@ -155,7 +147,7 @@ public class Estimate implements Comparable<Estimate> {
      * @return the row of the center pixel.
      */
     public int getRow() {
-        return y;
+        return row;
     }
 
     /**
@@ -165,15 +157,6 @@ public class Estimate implements Comparable<Estimate> {
      */
     public int getSliceIndex() {
         return slice;
-    }
-
-    /**
-     * Gets the signal.
-     *
-     * @return the signal at the center pixel.
-     */
-    public double getSignal() {
-        return signal;
     }
 
     /**
@@ -249,16 +232,16 @@ public class Estimate implements Comparable<Estimate> {
      * @return the x-coordinate of the estimated molecule position.
      */
     public double getX() {
-        return estrx;
+        return x;
     }
 
     /**
      * Sets the x.
      *
-     * @param estrx the x-coordinate of the estimated molecule position.
+     * @param x the x-coordinate of the estimated molecule position.
      */
-    public void setX(double estrx) {
-        this.estrx = estrx;
+    public void setX(double x) {
+        this.x = x;
     }
 
     /**
@@ -267,124 +250,124 @@ public class Estimate implements Comparable<Estimate> {
      * @return the y-coordinate of the estimated molecule position.
      */
     public double getY() {
-        return estry;
+        return y;
     }
 
     /**
      * Sets the y.
      *
-     * @param estry the y-coordinate of the estimated molecule position.
+     * @param y the y-coordinate of the estimated molecule position.
      */
-    public void setY(double estry) {
-        this.estry = estry;
+    public void setY(double y) {
+        this.y = y;
     }
 
     /**
-     * Gets the intensity estimate x.
+     * Gets the  horizontal intensity estimate.
      *
-     * @return the intensity estimate x
+     * @return the  horizontal intensity estimate
      */
-    public double getIntensityEstimateX() {
-        return estIx;
+    public double getHorizontalIntensity() {
+        return horizontalIntensity;
     }
 
     /**
-     * Sets the intensity estimate x.
+     * Sets the  horizontal intensity estimate.
      *
-     * @param estIx the new intensity estimate x
+     * @param intensity the new horizontal intensity estimate
      */
-    public void setIntensityEstimateX(double estIx) {
-        this.estIx = estIx;
+    public void setHorizontalIntensity(double intensity) {
+        this.horizontalIntensity = intensity;
     }
 
     /**
-     * Gets the intensity estimate y.
+     * Gets the vertical intensity estimate.
      *
-     * @return the intensity estimate y
+     * @return the vertical intensity estimate
      */
-    public double getIntensityEstimateY() {
-        return estIy;
+    public double getVerticalIntensity() {
+        return verticalIntensity;
     }
 
     /**
-     * Sets the intensity estimate y.
+     * Sets the vertical intensity estimate.
      *
-     * @param estIy the new intensity estimate y
+     * @param intensity the new vertical intensity estimate
      */
-    public void setIntensityEstimateY(double estIy) {
-        this.estIy = estIy;
+    public void setVerticalIntensity(double intensity) {
+        this.verticalIntensity = intensity;
     }
 
     /**
-     * Gets the background estimate x.
+     * Gets the horizontal background estimate.
      *
-     * @return the background estimate x
+     * @return the horizontal background estimate
      */
-    public double getBackgroundEstimateX() {
-        return estbx;
+    public double getHorizontalBackground() {
+        return horizontalBackground;
     }
 
     /**
-     * Sets the background estimate x.
+     * Sets the horizontal background estimate.
      *
-     * @param estbx the new background estimate x
+     * @param background the new horizontal background estimate
      */
-    public void setBackgroundEstimateX(double estbx) {
-        this.estbx = estbx;
+    public void setHorizontalBackground(double background) {
+        this.horizontalBackground = background;
     }
 
     /**
-     * Gets the background estimate y.
+     * Gets the vertical background estimate.
      *
-     * @return the background estimate y
+     * @return the vertical background estimate
      */
-    public double getBackgroundEstimateY() {
-        return estby;
+    public double getVerticalBackground() {
+        return verticalBackground;
     }
 
     /**
-     * Sets the background estimate y.
+     * Sets the vertical background estimate.
      *
-     * @param estby the new background estimate y
+     * @param background the new vertical background estimate
      */
-    public void setBackgroundEstimateY(double estby) {
-        this.estby = estby;
+    public void setVerticalBackground(double background) {
+        this.verticalBackground = background;
     }
 
     /**
-     * Gets the width estimate x.
+     * Gets the width estimate.
      *
-     * @return the width estimate x
+     * @return the width estimate
      */
-    public double getWidthEstimateX() {
-        return estwx;
+    public double getWidth() {
+        return width;
     }
 
     /**
-     * Sets the width estimate x.
+     * Sets the width estimate.
      *
-     * @param estwx the new width estimate x
+     * @param width the new width estimate
      */
-    public void setWidthEstimateX(double estwx) {
-        this.estwx = estwx;
+    public void setWidth(double width) {
+        this.width = width;
     }
 
     /**
-     * Gets the width estimate y.
+     * Gets the height estimate.
      *
-     * @return the width estimate y
+     * @return the height estimate
      */
-    public double getWidthEstimateY() {
-        return estwy;
+    public double getHeight() {
+        return height;
     }
 
     /**
-     * Sets the width estimate y.
+     * Sets the height estimate.
      *
-     * @param estwy the new width estimate y
+     * @param height the new height estimate
      */
-    public void setWidthEstimateY(double estwy) {
-        this.estwy = estwy;
+    public void setHeight(double height) {
+        this.height = height;
     }
 
     /* (non-Javadoc)
@@ -406,16 +389,16 @@ public class Estimate implements Comparable<Estimate> {
      * @return the third moment sum
      */
     public double getThirdMomentSum() {
-        return thirdmomentsum;
+        return thirdMomentSum;
     }
 
     /**
      * Sets the third moment sum.
      *
-     * @param thirdmomentsum the new third moment sum
+     * @param thirdMomentSum the new third moment sum
      */
-    public void setThirdMomentSum(double thirdmomentsum) {
-        this.thirdmomentsum = thirdmomentsum;
+    public void setThirdMomentSum(double thirdMomentSum) {
+        this.thirdMomentSum = thirdMomentSum;
     }
 
     /**
@@ -424,35 +407,15 @@ public class Estimate implements Comparable<Estimate> {
      * @return the third moment diff
      */
     public double getThirdMomentDiff() {
-        return thirdmomentdiff;
+        return thirdMomentDiff;
     }
 
     /**
      * Sets the third moment diff.
      *
-     * @param thirdmomentdiff the new third moment diff
+     * @param thirdMomentDiff the new third moment diff
      */
-    public void setThirdMomentDiff(double thirdmomentdiff) {
-        this.thirdmomentdiff = thirdmomentdiff;
-    }
-    
-    /**
-     * Sets the hu.
-     *
-     * @param index the index
-     * @param value the value
-     */
-    public void setHu(int index, double value) {
-        hu[index] = value;
-    }
-    
-    /**
-     * Gets the hu.
-     *
-     * @param index the index
-     * @return the hu
-     */
-    public double getHu(int index) {
-        return hu[index];
+    public void setThirdMomentDiff(double thirdMomentDiff) {
+        this.thirdMomentDiff = thirdMomentDiff;
     }
 }
