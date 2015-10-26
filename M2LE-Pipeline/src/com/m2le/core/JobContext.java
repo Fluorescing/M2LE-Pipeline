@@ -55,12 +55,12 @@ public class JobContext {
         public String choice[];
         public int precision;
         public String units;
-    };
+    }
     
-    private final List<Parameter> mList = new LinkedList<Parameter>();
-    private final Map<String,Double>  mNumeric  = new HashMap<String,Double>();
-    private final Map<String,Boolean> mCheckbox = new HashMap<String,Boolean>();
-    private final Map<String,String>  mChoice   = new HashMap<String,String>();
+    private final List<Parameter> mList = new LinkedList<>();
+    private final Map<String,Double>  mNumeric  = new HashMap<>();
+    private final Map<String,Boolean> mCheckbox = new HashMap<>();
+    private final Map<String,String>  mChoice   = new HashMap<>();
     private boolean mCanceled = false;
     
     /**
@@ -275,12 +275,9 @@ public class JobContext {
         
         // show the dialog to the user
         final GenericDialog dialog = createDialog();
-        
-        if (dialog.wasCanceled())
-            mCanceled = true;
-        else
-            mCanceled = false;
-        
+
+        mCanceled = dialog.wasCanceled();
+
         // create a jobcontext from the user-set preferences
         getPreferences(dialog);
         

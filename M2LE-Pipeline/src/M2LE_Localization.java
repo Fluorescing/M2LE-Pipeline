@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import com.m2le.core.*;
-import com.m2le.core.UserSettings;
 import static com.m2le.core.UserSettings.DEBUG_MODE;
 import static com.m2le.core.UserSettings.DB_TABLE;
 import static com.m2le.core.UserSettings.PIXEL_SIZE;

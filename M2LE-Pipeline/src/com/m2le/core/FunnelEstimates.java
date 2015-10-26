@@ -33,7 +33,7 @@ public final class FunnelEstimates {
     /**
      * Instantiates a new funnel estimates.
      */
-    private FunnelEstimates() { };
+    private FunnelEstimates() { }
     
     /**
      * The Class FunnelThread.
@@ -98,7 +98,7 @@ public final class FunnelEstimates {
         final int numCPU = ThreadHelper.getProcessorCount();
         final Thread[] threads = new Thread[numCPU];
         
-        final BlockingQueue<Estimate> funnelled = new LinkedBlockingQueue<Estimate>();
+        final BlockingQueue<Estimate> funnelled = new LinkedBlockingQueue<>();
         
         for (int n = 0; n < numCPU; n++) {
             Runnable r = new FunnelThread(estimates.get(n), funnelled);

@@ -109,10 +109,10 @@ public final class EccentricityRejector {
         final int numCPU = ThreadHelper.getProcessorCount();
         final Thread[] threads = new Thread[numCPU];
         
-        final List<BlockingQueue<Estimate>> circularRegions = new ArrayList<BlockingQueue<Estimate>>(numCPU);
+        final List<BlockingQueue<Estimate>> circularRegions = new ArrayList<>(numCPU);
         
         for (int i = 0; i < numCPU; i++) {
-            circularRegions.add(i, new LinkedBlockingQueue<Estimate>());
+            circularRegions.add(i, new LinkedBlockingQueue<>());
         }
         
         for (int n = 0; n < numCPU; n++) {

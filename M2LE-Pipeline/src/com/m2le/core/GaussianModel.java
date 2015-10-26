@@ -34,7 +34,7 @@ public final class GaussianModel {
     static ConcurrentLinkedQueue<double[]> allocations;
     
     static {
-        allocations = new ConcurrentLinkedQueue<double[]>();
+        allocations = new ConcurrentLinkedQueue<>();
         for (int i = 0; i < 100; i++) {
             allocations.offer(new double[4]);
         }

@@ -31,7 +31,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public final class RemoveDuplicates {
     
-    private RemoveDuplicates() { };
+    private RemoveDuplicates() { }
     
     /**
      * The Class FirstPassThread.
@@ -196,10 +196,10 @@ public final class RemoveDuplicates {
         final int numCPU = ThreadHelper.getProcessorCount();
         final Thread[] threads = new Thread[numCPU];
         
-        final List<BlockingQueue<Estimate>> reduced = new ArrayList<BlockingQueue<Estimate>>(numCPU);
+        final List<BlockingQueue<Estimate>> reduced = new ArrayList<>(numCPU);
         
         for (int i = 0; i < numCPU; i++) {
-            reduced.add(i, new LinkedBlockingQueue<Estimate>());
+            reduced.add(i, new LinkedBlockingQueue<>());
         }
         
         for (int n = 0; n < numCPU; n++) {
@@ -213,10 +213,10 @@ public final class RemoveDuplicates {
         // mark the end of the queue
         ThreadHelper.markEndOfQueue(reduced);
         
-        final List<BlockingQueue<Estimate>> finalreduced = new ArrayList<BlockingQueue<Estimate>>(numCPU);
+        final List<BlockingQueue<Estimate>> finalreduced = new ArrayList<>(numCPU);
         
         for (int i = 0; i < numCPU; i++) {
-            finalreduced.add(i, new LinkedBlockingQueue<Estimate>());
+            finalreduced.add(i, new LinkedBlockingQueue<>());
         }
         
         for (int n = 0; n < numCPU; n++) {

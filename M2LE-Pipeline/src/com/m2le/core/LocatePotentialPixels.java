@@ -48,10 +48,10 @@ public final class LocatePotentialPixels {
         
         final int threads = ThreadHelper.getProcessorCount();
         
-        final List<BlockingQueue<Estimate>> pixels = new ArrayList<BlockingQueue<Estimate>>(threads);
+        final List<BlockingQueue<Estimate>> pixels = new ArrayList<>(threads);
         
         for (int i = 0; i < threads; i++) {
-            pixels.add(i, new LinkedBlockingQueue<Estimate>());
+            pixels.add(i, new LinkedBlockingQueue<>());
         }
         
         final JobContext job = stack.getJobContext();

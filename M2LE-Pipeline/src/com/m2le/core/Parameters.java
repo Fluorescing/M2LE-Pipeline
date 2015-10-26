@@ -186,18 +186,11 @@ public class Parameters {
      * Checks if the parameters are valid.
      * @return true if value; false otherwise.
      */
-    public boolean isValid() {
-        if (Double.isInfinite(position)   || Double.isNaN(position)   ||
-            Double.isInfinite(intensity)  || Double.isNaN(intensity)  ||
-            Double.isInfinite(background) || Double.isNaN(background) ||
-            Double.isInfinite(width)      || Double.isNaN(width)) {
-          return false;
-        }
-        
-        if (intensity < 0. || background < 0. || width < 0.) {
-          return false;
-        }
-        
-        return true;
+    public boolean isInvalid() {
+        return Double.isInfinite(position)   || Double.isNaN(position)   ||
+               Double.isInfinite(intensity)  || Double.isNaN(intensity)  ||
+               Double.isInfinite(background) || Double.isNaN(background) ||
+               Double.isInfinite(width)      || Double.isNaN(width) ||
+               intensity < 0.0 || background < 0.0 || width < 0.0;
     }
 }

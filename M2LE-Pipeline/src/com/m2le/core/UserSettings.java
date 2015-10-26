@@ -118,7 +118,7 @@ public final class UserSettings {
     // get a list of all text windows (except log)
     private static String[] getResultsTables() {
         final Frame[] frames = WindowManager.getNonImageWindows();
-        final List<String> tables = new LinkedList<String>();
+        final List<String> tables = new LinkedList<>();
         tables.add("");
         for (Frame f : frames) {
             if (!f.getTitle().equalsIgnoreCase("log") 
@@ -126,7 +126,7 @@ public final class UserSettings {
                 tables.add(f.getTitle());
             }
         }
-        return tables.toArray(new String[0]);
+        return tables.toArray(new String[tables.size()]);
     }
     
     /**

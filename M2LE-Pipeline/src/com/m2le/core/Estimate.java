@@ -16,7 +16,6 @@
 
 package com.m2le.core;
 
-// TODO: Auto-generated Javadoc
 /**
  * The estimate class which holds information pertaining to the estimates.
  * @author Shane Stahlheber

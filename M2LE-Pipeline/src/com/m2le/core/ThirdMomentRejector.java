@@ -107,10 +107,10 @@ public final class ThirdMomentRejector {
         final int numCPU = ThreadHelper.getProcessorCount();
         final Thread[] threads = new Thread[numCPU];
         
-        final List<BlockingQueue<Estimate>> finalestimates = new ArrayList<BlockingQueue<Estimate>>(numCPU);
+        final List<BlockingQueue<Estimate>> finalestimates = new ArrayList<>(numCPU);
         
         for (int i = 0; i < numCPU; i++) {
-            finalestimates.add(i, new LinkedBlockingQueue<Estimate>());
+            finalestimates.add(i, new LinkedBlockingQueue<>());
         }
         
         

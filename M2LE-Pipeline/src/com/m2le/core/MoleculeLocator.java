@@ -103,10 +103,10 @@ public final class MoleculeLocator {
         final int numCPU = ThreadHelper.getProcessorCount();
         final Thread[] threads = new Thread[numCPU];
         
-        final List<BlockingQueue<Estimate>> estimates = new ArrayList<BlockingQueue<Estimate>>(numCPU);
+        final List<BlockingQueue<Estimate>> estimates = new ArrayList<>(numCPU);
         
         for (int i = 0; i < numCPU; i++) {
-            estimates.add(i, new LinkedBlockingQueue<Estimate>());
+            estimates.add(i, new LinkedBlockingQueue<>());
         }
         
         
@@ -341,7 +341,7 @@ public final class MoleculeLocator {
         }
         
         // check for invalid parameters (to reject)
-        if (!xparam.isValid() || !yparam.isValid()) {
+        if (xparam.isInvalid() || yparam.isInvalid()) {
             estimate.markRejected();
             return estimate;
         }
